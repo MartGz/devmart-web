@@ -37,6 +37,7 @@ export function Footer() {
             <li>
               <a
                 href={whatsappHref()}
+                data-track-whatsapp="footer"
                 {...(hasWhatsapp ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                 className="transition-colors hover:text-cielo"
               >
@@ -58,8 +59,8 @@ export function Footer() {
       <div className="border-t border-white/10">
         <div className="container-dm flex flex-col gap-2 py-6 font-mono text-xs text-niebla sm:flex-row sm:justify-between">
           <span>© 2026 DevMart Solutions · {site.city}</span>
-          <Link href="/contacto#datos" className="transition-colors hover:text-cielo">
-            Tratamiento de datos · Ley 1581 de 2012
+          <Link href="/privacidad" className="transition-colors hover:text-cielo">
+            Privacidad y cookies · Ley 1581 de 2012
           </Link>
         </div>
       </div>

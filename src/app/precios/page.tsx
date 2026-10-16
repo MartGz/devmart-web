@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Check } from "lucide-react";
+import { Cotizador } from "@/components/Cotizador";
 import { Label, PageHero, SectionHead, WhatsAppLink } from "@/components/ui";
 import { precios } from "@/lib/content";
 
@@ -61,7 +62,18 @@ export default function PreciosPage() {
         </div>
       </section>
 
-      <section className="py-24">
+      <section id="cotizador" className="py-24">
+        <div className="container-dm flex flex-col gap-12">
+          <SectionHead
+            label="Cotizador"
+            title="Arma tu proyecto en un minuto."
+            intro="Elige lo que necesitas y envíanos el resumen. Te respondemos con preguntas y una cotización cerrada."
+          />
+          <Cotizador />
+        </div>
+      </section>
+
+      <section className="bg-nube py-24">
         <div className="container-dm grid gap-12 lg:grid-cols-[1fr_1.4fr]">
           <SectionHead label="Preguntas" title="Lo que suelen preguntarnos." />
           <dl className="flex flex-col">
@@ -75,7 +87,7 @@ export default function PreciosPage() {
         </div>
       </section>
 
-      <section className="pb-24">
+      <section className="py-24">
         <div className="container-dm">
           <div className="flex flex-col items-start gap-6 rounded-card bg-cielo-tinte p-8 md:flex-row md:items-center md:justify-between md:p-12">
             <div className="flex flex-col gap-3">
@@ -86,7 +98,7 @@ export default function PreciosPage() {
               <Link href="/contacto" className="btn-primary">
                 Cotizar mi proyecto
               </Link>
-              <WhatsAppLink className="btn-secondary" message="Hola DevMart, quiero cotizar un proyecto.">
+              <WhatsAppLink className="btn-secondary" track="precios" message="Hola DevMart, quiero cotizar un proyecto.">
                 WhatsApp
               </WhatsAppLink>
             </div>

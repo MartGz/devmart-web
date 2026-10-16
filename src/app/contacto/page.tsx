@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Suspense } from "react";
 import { MapPin, MessageCircle } from "lucide-react";
 import { ContactForm, ContactFormWithParams } from "@/components/ContactForm";
@@ -34,7 +35,9 @@ export default function ContactoPage() {
               <p className="text-[16px] leading-[1.55] text-niebla">
                 Escríbenos por WhatsApp Business y te respondemos directamente.
               </p>
-              <WhatsAppLink className="btn-primary">Abrir WhatsApp</WhatsAppLink>
+              <WhatsAppLink className="btn-primary" track="contacto">
+                Abrir WhatsApp
+              </WhatsAppLink>
             </div>
             <div className="flex flex-col gap-4 rounded-card bg-blanco p-7 md:p-9">
               <Label>Dónde estamos</Label>
@@ -81,6 +84,9 @@ export default function ContactoPage() {
             <p className="text-[16px] leading-[1.6] text-texto-cuerpo">
               No vendemos ni compartimos tus datos con terceros para fines comerciales.
             </p>
+            <Link href="/privacidad" className="btn-secondary w-fit">
+              Leer la política completa
+            </Link>
           </div>
         </div>
       </section>

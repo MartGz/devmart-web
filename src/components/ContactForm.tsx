@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useState, type FormEvent, type ReactNode } from "react";
+import { useActionState, useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { useSearchParams } from "next/navigation";
 import { CheckCircle2, Loader2 } from "lucide-react";
 import { enviarContacto } from "@/app/contacto/actions";
+import { track } from "@/lib/analytics";
 import { presupuestos, tiposProyecto } from "@/lib/content";
 import { readContacto, validateContacto, type ContactoErrors, type ContactoState } from "@/lib/contacto";
 
@@ -40,17 +41,27 @@ function Field({
   );
 }
 
-/** Lee ?tipo= (desde Precios) para preseleccionar el tipo de proyecto. */
+/** Lee ?tipo= y ?idea= (desde Precios y el cotizador) para rellenar el formulario. */
 export function ContactFormWithParams() {
-  const tipo = useSearchParams().get("tipo") ?? undefined;
-  return <ContactForm defaultTipo={tipo} />;
+  const params = useSearchParams();
+  return (
+    <ContactForm
+      defaultTipo={params.get("tipo") ?? undefined}
+      defaultIdea={params.get("idea")?.slice(0, 2000) ?? undefined}
+    />
+  );
 }
 
-export function ContactForm({ defaultTipo }: { defaultTipo?: string }) {
+export function ContactForm({ defaultTipo, defaultIdea }: { defaultTipo?: string; defaultIdea?: string }) {
   const [state, formAction, pending] = useActionState<ContactoState, FormData>(enviarContacto, {
     status: "idle",
   });
   const [clientErrors, setClientErrors] = useState<ContactoErrors>({});
+  const [tipoEnviado, setTipoEnviado] = useState("");
+
+  useEffect(() => {
+    if (state.status === "success") track("contact_submit", { tipo: tipoEnviado });
+  }, [state.status, tipoEnviado]);
 
   if (state.status === "success") {
     return (
@@ -75,8 +86,10 @@ export function ContactForm({ defaultTipo }: { defaultTipo?: string }) {
     values.tipo ?? (tiposProyecto as readonly string[]).find((t) => t === defaultTipo) ?? "";
 
   function onSubmit(e: FormEvent<HTMLFormElement>) {
-    const errs = validateContacto(readContacto(new FormData(e.currentTarget)));
+    const data = readContacto(new FormData(e.currentTarget));
+    const errs = validateContacto(data);
     setClientErrors(errs);
+    setTipoEnviado(data.tipo);
     if (Object.keys(errs).length > 0) {
       e.preventDefault();
       const first = Object.keys(errs)[0];
@@ -144,7 +157,7 @@ export function ContactForm({ defaultTipo }: { defaultTipo?: string }) {
           name="descripcion"
           rows={6}
           placeholder="¿Qué quieres construir? ¿Para quién? ¿Tienes alguna fecha en mente?"
-          defaultValue={values.descripcion}
+          defaultValue={values.descripcion ?? defaultIdea}
           className={`${inputCls} resize-y`}
           {...a11y("descripcion")}
         />

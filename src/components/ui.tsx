@@ -67,14 +67,18 @@ export function WhatsAppLink({
   children,
   message,
   className,
+  track = "enlace",
 }: {
   children: ReactNode;
   message?: string;
   className?: string;
+  /** Ubicación que se registra en el evento whatsapp_click. */
+  track?: string;
 }) {
   return (
     <a
       href={whatsappHref(message)}
+      data-track-whatsapp={track}
       {...(hasWhatsapp ? { target: "_blank", rel: "noopener noreferrer" } : {})}
       className={className}
     >
@@ -105,7 +109,9 @@ export function CtaFinal({
         <h2 className="h1-hero max-w-[720px]">{title}</h2>
         <p className="max-w-[520px] text-lg leading-[1.55] text-niebla text-pretty">{intro}</p>
         <div className="flex flex-wrap gap-3">
-          <WhatsAppLink className="btn-primary">Escríbenos por WhatsApp</WhatsAppLink>
+          <WhatsAppLink className="btn-primary" track="cta-final">
+            Escríbenos por WhatsApp
+          </WhatsAppLink>
           {showForm && (
             <Link href="/contacto" className="btn-secondary-dark">
               Usar el formulario

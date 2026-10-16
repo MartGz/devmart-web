@@ -12,6 +12,24 @@ export type Post = {
 
 export const posts: Post[] = [
   {
+    slug: "como-preparar-tu-idea",
+    titulo: "Cinco preguntas para preparar tu idea antes de hablar con un desarrollador",
+    resumen:
+      "No necesitas saber de tecnología. Con estas respuestas, la cotización es más precisa y el proyecto arranca mejor.",
+    categoria: "Guías",
+    fecha: "2026-10-16",
+    lecturaMin: 4,
+  },
+  {
+    slug: "web-app-movil-o-app-web",
+    titulo: "¿Página web, aplicación web o app móvil? Cómo saber qué necesita tu negocio",
+    resumen:
+      "Las diferencias en lenguaje sencillo y una regla práctica para elegir sin gastar de más.",
+    categoria: "Guías",
+    fecha: "2026-09-30",
+    lecturaMin: 5,
+  },
+  {
     slug: "por-que-empezamos-con-un-prototipo",
     titulo: "Por qué empezamos cada proyecto con un prototipo navegable",
     resumen:
