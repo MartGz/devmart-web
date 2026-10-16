@@ -1,26 +1,198 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Design tokens — ver «Identidad visual DevMart Solutions/design_handoff_devmart_web/README.md» */
+@theme {
+  --color-noche: #0b0d12;
+  --color-cielo: #3ec1f3;
+  --color-cielo-profundo: #1e8fd0;
+  --color-cielo-tinte: #eaf7fd;
+  --color-nube: #f5f7fa;
+  --color-blanco: #ffffff;
+  --color-niebla: #8a93a3;
+  --color-pizarra: #4a5262;
+  --color-borde: #dde2e9;
+  --color-texto-cuerpo: #2b313c;
+  --color-rayado: #e7ebf0;
+
+  --radius-card: 18px;
+  --radius-panel: 14px;
+
+  --shadow-elevada: 0 24px 60px rgba(11, 13, 18, 0.12);
+
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-outfit), Helvetica, Arial, sans-serif;
+  --font-display: var(--font-unbounded), sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    scroll-padding-top: 96px;
+  }
+
+  body {
+    background: var(--color-blanco);
+    color: var(--color-noche);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-cielo-profundo);
+    outline-offset: 3px;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@utility container-dm {
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: 20px;
+  @variant md {
+    padding-inline: 48px;
+  }
+}
+
+/* Etiqueta mono: // SERVICIOS */
+@utility label-mono {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+@utility h1-hero {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(36px, 4.6vw, 64px);
+  line-height: 1.02;
+  letter-spacing: -0.05em;
+  text-wrap: balance;
+}
+
+@utility h2-dm {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 28px;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+  @variant md {
+    font-size: 34px;
+  }
+}
+
+@utility h3-dm {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+  @variant lg {
+    font-size: 20px;
+  }
+}
+
+@utility placeholder-rayado {
+  background: repeating-linear-gradient(
+    135deg,
+    var(--color-nube) 0 8px,
+    var(--color-rayado) 8px 16px
+  );
+}
+
+/* Botones */
+@utility btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 26px;
+  border-radius: 999px;
+  background: var(--color-cielo);
+  color: var(--color-noche);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.2;
+  transition: background-color 150ms ease, color 150ms ease;
+  &:hover {
+    background: var(--color-cielo-profundo);
+    color: var(--color-blanco);
+  }
+}
+
+@utility btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14.5px 24px;
+  border-radius: 999px;
+  border: 1.5px solid var(--color-noche);
+  color: var(--color-noche);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.2;
+  transition: background-color 150ms ease, color 150ms ease;
+  &:hover {
+    background: var(--color-noche);
+    color: var(--color-blanco);
+  }
+}
+
+/* Cubo del hero: flotado leve y cara derecha que se separa en hover */
+@keyframes cube-float {
+  0%,
+  100% {
+    transform: translateY(-6px);
+  }
+  50% {
+    transform: translateY(6px);
+  }
+}
+
+.cube-float {
+  animation: cube-float 4s ease-in-out infinite;
+}
+
+.cube-right {
+  transition: transform 300ms ease;
+}
+
+.cube-hover:hover .cube-right {
+  transform: translate(6px, 3.5px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cube-float {
+    animation: none;
+  }
+  .cube-right {
+    transition: none;
+  }
+}
+
+@utility btn-secondary-dark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14.5px 24px;
+  border-radius: 999px;
+  border: 1.5px solid var(--color-nube);
+  color: var(--color-nube);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.2;
+  transition: background-color 150ms ease, color 150ms ease;
+  &:hover {
+    background: var(--color-nube);
+    color: var(--color-noche);
+  }
 }

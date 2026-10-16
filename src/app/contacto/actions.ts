@@ -1,0 +1,81 @@
+"use server";
+
+import { readContacto, validateContacto, type ContactoData, type ContactoState } from "@/lib/contacto";
+
+function texto(d: ContactoData) {
+  return [
+    `Nombre: ${d.nombre}`,
+    `Email: ${d.email}`,
+    `Teléfono: ${d.telefono}`,
+    `Tipo de proyecto: ${d.tipo}`,
+    `Presupuesto: ${d.presupuesto}`,
+    "",
+    d.descripcion,
+    "",
+    "Autorizó el tratamiento de datos (Ley 1581 de 2012).",
+  ].join("\n");
+}
+
+/**
+ * Envía el mensaje con el primer proveedor configurado:
+ * - Resend: RESEND_API_KEY + CONTACT_TO_EMAIL (+ CONTACT_FROM_EMAIL opcional)
+ * - Formspree: FORMSPREE_ENDPOINT
+ * Sin proveedor, en desarrollo solo se registra en la consola.
+ */
+async function enviar(d: ContactoData): Promise<boolean> {
+  const { RESEND_API_KEY, CONTACT_TO_EMAIL, CONTACT_FROM_EMAIL, FORMSPREE_ENDPOINT } = process.env;
+
+  if (RESEND_API_KEY && CONTACT_TO_EMAIL) {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        from: CONTACT_FROM_EMAIL || "DevMart Web <onboarding@resend.dev>",
+        to: [CONTACT_TO_EMAIL],
+        reply_to: d.email,
+        subject: `Nuevo proyecto: ${d.tipo} — ${d.nombre}`,
+        text: texto(d),
+      }),
+    });
+    return res.ok;
+  }
+
+  if (FORMSPREE_ENDPOINT) {
+    const res = await fetch(FORMSPREE_ENDPOINT, {
+      method: "POST",
+      headers: { Accept: "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify({ ...d, _replyto: d.email, _subject: `Nuevo proyecto: ${d.tipo}` }),
+    });
+    return res.ok;
+  }
+
+  if (process.env.NODE_ENV !== "production") {
+    console.info("[contacto] Sin proveedor de envío configurado. Mensaje recibido:\n" + texto(d));
+    return true;
+  }
+  console.error("[contacto] Falta configurar RESEND_API_KEY/CONTACT_TO_EMAIL o FORMSPREE_ENDPOINT.");
+  return false;
+}
+
+export async function enviarContacto(_prev: ContactoState, fd: FormData): Promise<ContactoState> {
+  // Campo trampa para bots: si viene lleno, fingimos éxito y no enviamos nada.
+  if (String(fd.get("empresa_web") ?? "")) return { status: "success" };
+
+  const data = readContacto(fd);
+  const errors = validateContacto(data);
+  if (Object.keys(errors).length > 0) {
+    return { status: "error", errors, values: data };
+  }
+
+  try {
+    if (await enviar(data)) return { status: "success" };
+  } catch (err) {
+    console.error("[contacto] Error al enviar:", err);
+  }
+  return {
+    status: "error",
+    errors: {},
+    values: data,
+    message: "No pudimos enviar tu mensaje. Inténtalo de nuevo o escríbenos por WhatsApp.",
+  };
+}
