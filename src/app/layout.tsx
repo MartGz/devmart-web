@@ -1,10 +1,6 @@
 import type { Metadata } from "next";
 import { Outfit, Unbounded, JetBrains_Mono } from "next/font/google";
-import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
-import { WhatsAppFloat } from "@/components/WhatsAppFloat";
 import { OrganizationJsonLd } from "@/components/JsonLd";
-import { Analytics } from "@/components/Analytics";
 import { site, siteUrl } from "@/lib/site";
 import "./globals.css";
 
@@ -44,12 +40,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${outfit.variable} ${unbounded.variable} ${jetbrainsMono.variable} h-full`}
     >
       <body className="flex min-h-full flex-col">
-        <Header />
-        <main className="flex-1">{children}</main>
-        <Footer />
-        <WhatsAppFloat />
+        {children}
         <OrganizationJsonLd />
-        <Analytics />
       </body>
     </html>
   );

@@ -1,0 +1,9 @@
+import { initBotId } from "botid/client/core";
+
+// Vercel BotID: verificación invisible contra bots en los formularios (server actions = POST a la página).
+initBotId({
+  protect: [
+    { path: "/contacto", method: "POST" },
+    { path: "/admin/login", method: "POST" },
+  ],
+});

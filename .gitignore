@@ -43,3 +43,8 @@ next-env.d.ts
 !.env.example
 
 .vercel
+
+# skills de agentes instalados por las integraciones
+.agents/
+.claude/skills/
+skills-lock.json

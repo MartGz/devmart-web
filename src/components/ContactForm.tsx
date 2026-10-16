@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useActionState, useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { useSearchParams } from "next/navigation";
 import { CheckCircle2, Loader2 } from "lucide-react";
-import { enviarContacto } from "@/app/contacto/actions";
+import { enviarContacto } from "@/app/(sitio)/contacto/actions";
 import { track } from "@/lib/analytics";
 import { presupuestos, tiposProyecto } from "@/lib/content";
 import { readContacto, validateContacto, type ContactoErrors, type ContactoState } from "@/lib/contacto";

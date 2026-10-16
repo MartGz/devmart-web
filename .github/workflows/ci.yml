@@ -1,0 +1,31 @@
+# Revisa cada push y pull request: lint, tipos, compilación y vulnerabilidades en producción.
+# La compilación corre sin DATABASE_URL (usa el contenido estático de respaldo).
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+      - name: Vulnerabilidades en dependencias de producción
+        run: npm audit --omit=dev --audit-level=high

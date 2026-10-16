@@ -1,9 +1,9 @@
 import type { MetadataRoute } from "next";
-import { posts } from "@/lib/blog";
-import { proyectos } from "@/lib/content";
+import { getPosts, getProyectos } from "@/lib/data";
 import { siteUrl } from "@/lib/site";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const [posts, proyectos] = await Promise.all([getPosts(), getProyectos()]);
   const pages = ["", "/servicios", "/proyectos", "/nosotros", "/blog", "/precios", "/contacto", "/privacidad"];
   return [
     ...pages.map((p) => ({ url: `${siteUrl}${p}` })),

@@ -38,7 +38,7 @@ export function validateContacto(d: ContactoData): ContactoErrors {
   if (d.nombre.length < 2) e.nombre = "Escribe tu nombre.";
   else if (d.nombre.length > 100) e.nombre = "El nombre es demasiado largo.";
 
-  if (!EMAIL.test(d.email)) e.email = "Escribe un email válido.";
+  if (!EMAIL.test(d.email) || d.email.length > 254) e.email = "Escribe un email válido.";
 
   const digits = d.telefono.replace(/\D/g, "");
   if (!digits) e.telefono = "Escribe un teléfono de contacto.";

@@ -1,4 +1,5 @@
-// Índice del blog. El cuerpo de cada artículo vive en src/content/blog/<slug>.mdx.
+// Contenido inicial del blog (se copia a la base de datos con `npm run db:seed`).
+// El cuerpo de cada artículo vive en src/content/blog/<slug>.md.
 
 export type Post = {
   slug: string;
@@ -48,8 +49,6 @@ export const posts: Post[] = [
     lecturaMin: 5,
   },
 ];
-
-export const sortedPosts = [...posts].sort((a, b) => b.fecha.localeCompare(a.fecha));
 
 export function formatFecha(iso: string) {
   return new Intl.DateTimeFormat("es-CO", {
