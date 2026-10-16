@@ -1,5 +1,6 @@
 import { AdminForm } from "@/components/admin/AdminForm";
 import { Checkbox, Field, Input, Panel, Textarea } from "@/components/admin/fields";
+import { ImagenField } from "@/components/admin/ImagenField";
 import { guardarProyecto } from "@/lib/admin/actions";
 
 type ProyectoEditable = {
@@ -14,6 +15,8 @@ type ProyectoEditable = {
   reto: string;
   solucion: string[];
   resultado: string;
+  imagen: string | null;
+  imagenAlt: string;
   orden: number;
   publicado: boolean;
 };
@@ -45,6 +48,17 @@ export function ProyectoForm({ proyecto: p }: { proyecto?: ProyectoEditable }) {
         <Field label="Tecnologías" hint="una por línea">
           <Textarea name="stack" rows={4} defaultValue={p?.stack.join("\n")} className="font-mono text-[14px]" />
         </Field>
+      </Panel>
+
+      <Panel>
+        <ImagenField
+          name="imagen"
+          altName="imagenAlt"
+          quitarName="quitarImagen"
+          actual={p?.imagen}
+          alt={p?.imagenAlt}
+          label="Captura del proyecto"
+        />
       </Panel>
 
       <Panel className="flex flex-col gap-5">

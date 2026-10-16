@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -60,7 +61,13 @@ async function Caso({ params }: Pick<PageProps<"/proyectos/[slug]">, "params">) 
       </section>
 
       <div className="container-dm pb-24">
-        <ImagePlaceholder className="aspect-[16/9] rounded-panel" />
+        {p.imagen ? (
+          <div className="relative aspect-[16/9] overflow-hidden rounded-panel bg-nube">
+            <Image src={p.imagen} alt={p.imagenAlt ?? ""} fill loading="eager" sizes="(min-width: 1280px) 1200px, 100vw" className="object-cover" />
+          </div>
+        ) : (
+          <ImagePlaceholder className="aspect-[16/9] rounded-panel" />
+        )}
       </div>
 
       <section className="bg-nube py-24">

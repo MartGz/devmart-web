@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { Code2, Layers, MousePointerClick } from "lucide-react";
 import { Cube } from "@/components/Cube";
 import { CtaFinal, Label, Num, SectionHead } from "@/components/ui";
 import { proceso } from "@/lib/content";
+import { getFotoEquipo } from "@/lib/data";
 
 export const metadata: Metadata = {
   title: "Nosotros",
@@ -52,13 +54,7 @@ export default function NosotrosPage() {
       {/* Fundador */}
       <section className="bg-nube py-24">
         <div className="container-dm grid gap-12 lg:grid-cols-[1fr_1.4fr]">
-          <div
-            className="placeholder-rayado flex aspect-[4/5] max-w-[420px] items-center justify-center rounded-panel font-mono text-xs text-pizarra"
-            role="img"
-            aria-label="Foto pendiente de Martín Elías García Zurique"
-          >
-            foto del fundador
-          </div>
+          <FotoFundador />
           <div className="flex flex-col justify-center gap-5">
             <Label>Fundador</Label>
             <h2 className="h2-dm">Martín Elías García Zurique</h2>
@@ -104,5 +100,25 @@ export default function NosotrosPage() {
 
       <CtaFinal />
     </>
+  );
+}
+
+async function FotoFundador() {
+  const foto = await getFotoEquipo();
+  if (!foto) {
+    return (
+      <div
+        className="placeholder-rayado flex aspect-[4/5] max-w-[420px] items-center justify-center rounded-panel font-mono text-xs text-pizarra"
+        role="img"
+        aria-label="Foto pendiente de Martín Elías García Zurique"
+      >
+        foto del fundador
+      </div>
+    );
+  }
+  return (
+    <div className="relative aspect-[4/5] w-full max-w-[420px] overflow-hidden rounded-panel bg-cielo-tinte">
+      <Image src={foto.url} alt={foto.alt} fill sizes="(min-width: 1024px) 420px, 100vw" className="object-cover" />
+    </div>
   );
 }

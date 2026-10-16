@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Material de diseño de referencia (no es código de la app).
+    "Identidad visual DevMart Solutions/**",
   ]),
 ]);
 

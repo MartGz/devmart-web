@@ -1,7 +1,7 @@
 import "server-only";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { and, asc, desc, eq } from "drizzle-orm";
+import { and, asc, desc, eq, inArray } from "drizzle-orm";
 import { cacheLife, cacheTag } from "next/cache";
 import { posts as postsEstaticos, type Post as PostIndice } from "./blog";
 import { precios as preciosEstaticos, proyectos as proyectosEstaticos, type Precio, type Proyecto } from "./content";
@@ -14,7 +14,10 @@ import { db, hasDb, schema } from "./db";
 export type Post = PostIndice & { cuerpo: string };
 export type { Precio, Proyecto };
 
-export const TAGS = { posts: "posts", proyectos: "proyectos", precios: "precios" } as const;
+export const TAGS = { posts: "posts", proyectos: "proyectos", precios: "precios", equipo: "equipo" } as const;
+
+/** Claves de la tabla `ajustes` que se editan desde el panel. */
+export const AJUSTES = { fotoEquipo: "foto_equipo", fotoEquipoAlt: "foto_equipo_alt" } as const;
 
 async function cuerpoEstatico(slug: string) {
   return readFile(join(process.cwd(), "src/content/blog", `${slug}.md`), "utf8").catch(() => "");
@@ -69,10 +72,14 @@ const proyectoColumns = {
   reto: schema.proyectos.reto,
   solucion: schema.proyectos.solucion,
   resultado: schema.proyectos.resultado,
+  imagen: schema.proyectos.imagen,
+  imagenAlt: schema.proyectos.imagenAlt,
 };
 
-function limpiarProyecto(p: { url: string | null; urlLabel: string | null } & Omit<Proyecto, "url" | "urlLabel">): Proyecto {
-  return { ...p, url: p.url ?? undefined, urlLabel: p.urlLabel ?? undefined };
+type ProyectoFila = { url: string | null; urlLabel: string | null; imagen: string | null } & Omit<Proyecto, "url" | "urlLabel" | "imagen">;
+
+function limpiarProyecto(p: ProyectoFila): Proyecto {
+  return { ...p, url: p.url ?? undefined, urlLabel: p.urlLabel ?? undefined, imagen: p.imagen ?? undefined };
 }
 
 export async function getProyectos(): Promise<Proyecto[]> {
@@ -99,6 +106,21 @@ export async function getProyecto(slug: string): Promise<Proyecto | null> {
     .where(and(eq(schema.proyectos.slug, slug), eq(schema.proyectos.publicado, true)))
     .limit(1);
   return row ? limpiarProyecto(row) : null;
+}
+
+/** Foto del equipo de /nosotros (null = placeholder). */
+export async function getFotoEquipo(): Promise<{ url: string; alt: string } | null> {
+  "use cache";
+  cacheTag(TAGS.equipo);
+  cacheLife("max");
+  if (!hasDb) return null;
+  const rows = await db()
+    .select()
+    .from(schema.ajustes)
+    .where(inArray(schema.ajustes.clave, [AJUSTES.fotoEquipo, AJUSTES.fotoEquipoAlt]));
+  const valor = (clave: string) => rows.find((r) => r.clave === clave)?.valor ?? "";
+  const url = valor(AJUSTES.fotoEquipo);
+  return url ? { url, alt: valor(AJUSTES.fotoEquipoAlt) } : null;
 }
 
 export async function getPrecios(): Promise<Precio[]> {

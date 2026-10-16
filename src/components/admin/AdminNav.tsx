@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Activity, FileText, FolderKanban, LayoutDashboard, Mail, Tag } from "lucide-react";
+import { Activity, FileText, FolderKanban, LayoutDashboard, Mail, Tag, Users } from "lucide-react";
 
 const items = [
   { href: "/admin", label: "Resumen", icon: LayoutDashboard },
@@ -10,6 +10,7 @@ const items = [
   { href: "/admin/blog", label: "Blog", icon: FileText },
   { href: "/admin/proyectos", label: "Proyectos", icon: FolderKanban },
   { href: "/admin/precios", label: "Precios", icon: Tag },
+  { href: "/admin/equipo", label: "Equipo", icon: Users },
   { href: "/admin/actividad", label: "Actividad", icon: Activity },
 ];
 

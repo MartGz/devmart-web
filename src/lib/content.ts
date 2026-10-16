@@ -93,6 +93,9 @@ export type Proyecto = {
   reto: string;
   solucion: string[];
   resultado: string;
+  /** Captura subida desde el panel (Vercel Blob). */
+  imagen?: string;
+  imagenAlt?: string;
 };
 
 export const proyectos: Proyecto[] = [

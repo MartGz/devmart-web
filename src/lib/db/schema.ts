@@ -49,6 +49,9 @@ export const proyectos = pgTable("proyectos", {
   reto: text("reto").notNull(),
   solucion: jsonb("solucion").$type<string[]>().notNull().default([]),
   resultado: text("resultado").notNull(),
+  /** Captura en Vercel Blob; null = se muestra el placeholder. */
+  imagen: text("imagen"),
+  imagenAlt: text("imagen_alt").notNull().default(""),
   orden: integer("orden").notNull().default(0),
   publicado: boolean("publicado").notNull().default(true),
   actualizado: timestamp("actualizado", { withTimezone: true }).notNull().defaultNow(),

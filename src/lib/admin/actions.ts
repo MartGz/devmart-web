@@ -7,9 +7,10 @@ import { z } from "zod";
 import { requireAdmin } from "@/lib/auth/dal";
 import { destroySession } from "@/lib/auth/session";
 import { tiposProyecto } from "@/lib/content";
-import { TAGS } from "@/lib/data";
+import { AJUSTES, TAGS } from "@/lib/data";
 import { db, schema } from "@/lib/db";
 import { estadosMensaje } from "@/lib/db/schema";
+import { archivoDe, borrarImagen, subirImagen } from "@/lib/admin/imagenes";
 import { registrar } from "@/lib/security";
 
 // Acciones del panel. Cada una vuelve a verificar la sesión (no se confía en el cliente),
@@ -180,6 +181,8 @@ const proyectoSchema = z.object({
   reto: texto(10, 3000, "El reto"),
   solucion: lista,
   resultado: texto(10, 3000, "El resultado"),
+  imagenAlt: z.string().trim().max(200, "Texto alternativo: máximo 200 caracteres.").default(""),
+  quitarImagen: z.string().optional(),
   orden: z.coerce.number().int().min(0).max(999).default(0),
   publicado: z.string().optional(),
 });
@@ -189,8 +192,24 @@ export async function guardarProyecto(_prev: FormState, fd: FormData): Promise<F
   const id = idDe(fd);
   const parsed = proyectoSchema.safeParse(campos(fd));
   if (!parsed.success) return errores(parsed.error);
-  const v = parsed.data;
-  const valores = { ...v, slug: v.slug || slugify(v.cliente), publicado: v.publicado === "on", actualizado: new Date() };
+  const { quitarImagen, ...v } = parsed.data;
+  const archivo = archivoDe(fd, "imagen");
+  const [actual] = id
+    ? await db().select({ imagen: schema.proyectos.imagen }).from(schema.proyectos).where(eq(schema.proyectos.id, id)).limit(1)
+    : [];
+  const quitar = quitarImagen === "on" && !archivo;
+  if ((archivo || (actual?.imagen && !quitar)) && !v.imagenAlt) {
+    return { ok: false, errors: ["Texto alternativo: describe la captura para lectores de pantalla y buscadores."] };
+  }
+
+  const slug = v.slug || slugify(v.cliente);
+  let imagen = quitar ? null : (actual?.imagen ?? null);
+  if (archivo) {
+    const subida = await subirImagen(archivo, `proyectos/${slug}`);
+    if ("error" in subida) return { ok: false, errors: [subida.error] };
+    imagen = subida.url;
+  }
+  const valores = { ...v, slug, imagen, publicado: v.publicado === "on", actualizado: new Date() };
   try {
     if (id) {
       await db().update(schema.proyectos).set(valores).where(eq(schema.proyectos.id, id));
@@ -198,11 +217,14 @@ export async function guardarProyecto(_prev: FormState, fd: FormData): Promise<F
       await db().insert(schema.proyectos).values(valores);
     }
   } catch (err) {
+    if (archivo) await borrarImagen(imagen);
     if (esDuplicado(err)) return { ok: false, errors: ["Ya existe un proyecto con ese slug."] };
     throw err;
   }
+  // La imagen anterior se borra solo cuando el cambio ya quedó guardado.
+  if (actual?.imagen && actual.imagen !== imagen) await borrarImagen(actual.imagen);
   updateTag(TAGS.proyectos);
-  await registrar(id ? "proyecto.editado" : "proyecto.creado", valores.slug);
+  await registrar(id ? "proyecto.editado" : "proyecto.creado", archivo ? `${slug} (nueva captura)` : slug);
   if (!id) redirect("/admin/proyectos");
   return { ok: true, message: "Proyecto guardado y publicado en el sitio." };
 }
@@ -211,7 +233,11 @@ export async function eliminarProyecto(fd: FormData) {
   await requireAdmin();
   const id = idDe(fd);
   if (id) {
-    await db().delete(schema.proyectos).where(eq(schema.proyectos.id, id));
+    const [borrado] = await db()
+      .delete(schema.proyectos)
+      .where(eq(schema.proyectos.id, id))
+      .returning({ imagen: schema.proyectos.imagen });
+    await borrarImagen(borrado?.imagen);
     updateTag(TAGS.proyectos);
     await registrar("proyecto.eliminado", `#${id}`);
   }
@@ -253,4 +279,49 @@ export async function eliminarPrecio(fd: FormData) {
     await registrar("precio.eliminado", `#${id}`);
   }
   redirect("/admin/precios");
+}
+
+/* ───────────── Equipo ───────────── */
+
+const equipoSchema = z.object({
+  fotoAlt: z.string().trim().max(200, "Texto alternativo: máximo 200 caracteres.").default(""),
+  quitarFoto: z.string().optional(),
+});
+
+async function ajuste(clave: string) {
+  const [row] = await db().select({ valor: schema.ajustes.valor }).from(schema.ajustes).where(eq(schema.ajustes.clave, clave)).limit(1);
+  return row?.valor ?? null;
+}
+
+async function guardarAjuste(clave: string, valor: string) {
+  await db()
+    .insert(schema.ajustes)
+    .values({ clave, valor })
+    .onConflictDoUpdate({ target: schema.ajustes.clave, set: { valor } });
+}
+
+export async function guardarEquipo(_prev: FormState, fd: FormData): Promise<FormState> {
+  await requireAdmin();
+  const parsed = equipoSchema.safeParse(campos(fd));
+  if (!parsed.success) return errores(parsed.error);
+  const { fotoAlt, quitarFoto } = parsed.data;
+  const archivo = archivoDe(fd, "foto");
+  const actual = await ajuste(AJUSTES.fotoEquipo);
+  const quitar = quitarFoto === "on" && !archivo;
+  if ((archivo || (actual && !quitar)) && !fotoAlt) {
+    return { ok: false, errors: ["Texto alternativo: describe la foto para lectores de pantalla y buscadores."] };
+  }
+
+  let foto = quitar ? "" : (actual ?? "");
+  if (archivo) {
+    const subida = await subirImagen(archivo, "equipo");
+    if ("error" in subida) return { ok: false, errors: [subida.error] };
+    foto = subida.url;
+  }
+  await guardarAjuste(AJUSTES.fotoEquipo, foto);
+  await guardarAjuste(AJUSTES.fotoEquipoAlt, fotoAlt);
+  if (actual && actual !== foto) await borrarImagen(actual);
+  updateTag(TAGS.equipo);
+  await registrar("equipo.editado", archivo ? "nueva foto" : quitar ? "foto quitada" : "texto alternativo");
+  return { ok: true, message: "Foto del equipo guardada y publicada en el sitio." };
 }

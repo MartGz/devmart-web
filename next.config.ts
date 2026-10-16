@@ -19,7 +19,7 @@ const csp = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} ${ga} ${plausibleOrigin} https://vercel.live`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https:",
+  "img-src 'self' data: blob: https://*.public.blob.vercel-storage.com https:",
   "font-src 'self' data:",
   `connect-src 'self' ${ga} ${plausibleOrigin} https://vercel.live wss://ws-us3.pusher.com`,
   "frame-src https://vercel.live",
@@ -45,6 +45,14 @@ const nextConfig: NextConfig = {
   partialPrefetching: true,
   reactCompiler: true,
   poweredByHeader: false,
+  // Capturas y fotos subidas desde /admin a Vercel Blob.
+  images: {
+    remotePatterns: [{ protocol: "https", hostname: "*.public.blob.vercel-storage.com", pathname: "/**" }],
+  },
+  experimental: {
+    // Imágenes de hasta 4 MB por server action, más el margen del multipart.
+    serverActions: { bodySizeLimit: "4.5mb" },
+  },
   turbopack: {
     rules: {
       "*.css": {

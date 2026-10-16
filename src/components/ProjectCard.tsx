@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import type { Proyecto } from "@/lib/content";
@@ -9,7 +10,19 @@ export function ProjectCard({ p }: { p: Proyecto }) {
       href={`/proyectos/${p.slug}`}
       className="group flex flex-col overflow-hidden rounded-card bg-blanco transition-shadow duration-150 hover:shadow-elevada"
     >
-      <ImagePlaceholder className="aspect-[4/3]" />
+      {p.imagen ? (
+        <div className="relative aspect-[4/3] overflow-hidden bg-nube">
+          <Image
+            src={p.imagen}
+            alt={p.imagenAlt ?? ""}
+            fill
+            sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+            className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+          />
+        </div>
+      ) : (
+        <ImagePlaceholder className="aspect-[4/3]" />
+      )}
       <div className="flex flex-1 flex-col gap-2 p-7">
         <Label>{p.tipo}</Label>
         <h3 className="h3-dm">{p.cliente}</h3>

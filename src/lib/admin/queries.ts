@@ -1,6 +1,7 @@
 import "server-only";
-import { asc, count, desc, eq } from "drizzle-orm";
+import { asc, count, desc, eq, inArray } from "drizzle-orm";
 import { requireAdmin } from "@/lib/auth/dal";
+import { AJUSTES } from "@/lib/data";
 import { db, hasDb, schema } from "@/lib/db";
 import type { EstadoMensaje } from "@/lib/db/schema";
 
@@ -97,4 +98,14 @@ export async function listarPrecios() {
 export async function listarActividad() {
   const d = await guard();
   return d.select().from(schema.actividad).orderBy(desc(schema.actividad.creado)).limit(200);
+}
+
+export async function obtenerEquipo() {
+  const d = await guard();
+  const rows = await d
+    .select()
+    .from(schema.ajustes)
+    .where(inArray(schema.ajustes.clave, [AJUSTES.fotoEquipo, AJUSTES.fotoEquipoAlt]));
+  const valor = (clave: string) => rows.find((r) => r.clave === clave)?.valor ?? "";
+  return { foto: valor(AJUSTES.fotoEquipo) || null, fotoAlt: valor(AJUSTES.fotoEquipoAlt) };
 }

@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.2.0",
+    "@vercel/blob": "^2.8.2",
     "botid": "^1.5.11",
     "drizzle-orm": "^0.45.4",
     "iron-session": "^9.0.1",
