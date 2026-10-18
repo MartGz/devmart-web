@@ -13,7 +13,7 @@ import { esSecretoTotp, verifyTotp } from "@/lib/auth/totp";
 import { tiposProyecto } from "@/lib/content";
 import { AJUSTES, TAGS } from "@/lib/data";
 import { db, schema } from "@/lib/db";
-import { estadosMensaje } from "@/lib/db/schema";
+import { estadosMensaje, estadosProyecto } from "@/lib/db/schema";
 import { archivoDe, borrarImagen, subirImagen } from "@/lib/admin/imagenes";
 import { registrar } from "@/lib/security";
 
@@ -185,6 +185,7 @@ const proyectoSchema = z.object({
   reto: texto(10, 3000, "El reto"),
   solucion: lista,
   resultado: texto(10, 3000, "El resultado"),
+  estado: z.enum(estadosProyecto, "Elige si es un sitio en producción o un prototipo."),
   imagenAlt: z.string().trim().max(200, "Texto alternativo: máximo 200 caracteres.").default(""),
   quitarImagen: z.string().optional(),
   orden: z.coerce.number().int().min(0).max(999).default(0),

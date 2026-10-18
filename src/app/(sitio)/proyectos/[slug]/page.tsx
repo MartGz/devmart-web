@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
+import { EstadoBadge } from "@/components/ProjectCard";
 import { CtaFinal, ImagePlaceholder, Label, Num } from "@/components/ui";
 import { getProyecto, getProyectos } from "@/lib/data";
 
@@ -41,7 +42,10 @@ async function Caso({ params }: Pick<PageProps<"/proyectos/[slug]">, "params">) 
         >
           <ArrowLeft size={18} strokeWidth={1.5} aria-hidden /> Proyectos
         </Link>
-        <Label>{p.tipo}</Label>
+        <div className="flex flex-wrap items-center gap-3">
+          <Label>{p.tipo}</Label>
+          <EstadoBadge estado={p.estado} />
+        </div>
         <h1 className="h1-hero max-w-[880px]">{p.cliente}</h1>
         <p className="max-w-[620px] text-lg leading-[1.55] text-pizarra text-pretty">{p.resumen}</p>
         <div className="flex flex-wrap items-center gap-x-6 gap-y-4">

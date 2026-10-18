@@ -3,6 +3,10 @@ import { boolean, index, integer, jsonb, pgTable, serial, text, timestamp } from
 export const estadosMensaje = ["nuevo", "en_conversacion", "cerrado", "descartado"] as const;
 export type EstadoMensaje = (typeof estadosMensaje)[number];
 
+/** Un caso puede ser un sitio en producción o un prototipo navegable. */
+export const estadosProyecto = ["produccion", "prototipo"] as const;
+export type EstadoProyecto = (typeof estadosProyecto)[number];
+
 /** Mensajes del formulario de contacto. */
 export const mensajes = pgTable(
   "mensajes",
@@ -49,6 +53,7 @@ export const proyectos = pgTable("proyectos", {
   reto: text("reto").notNull(),
   solucion: jsonb("solucion").$type<string[]>().notNull().default([]),
   resultado: text("resultado").notNull(),
+  estado: text("estado").$type<EstadoProyecto>().notNull().default("produccion"),
   /** Captura en Vercel Blob; null = se muestra el placeholder. */
   imagen: text("imagen"),
   imagenAlt: text("imagen_alt").notNull().default(""),

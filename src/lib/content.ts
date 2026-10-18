@@ -93,6 +93,8 @@ export type Proyecto = {
   reto: string;
   solucion: string[];
   resultado: string;
+  /** «produccion»: sitio real publicado; «prototipo»: prototipo navegable. */
+  estado: "produccion" | "prototipo";
   /** Captura subida desde el panel (Vercel Blob). */
   imagen?: string;
   imagenAlt?: string;
@@ -103,6 +105,7 @@ export const proyectos: Proyecto[] = [
     slug: "eliab-bohorquez-perfumeria",
     cliente: "Eliab Bohorquez Perfumería",
     tipo: "Tienda en línea",
+    estado: "prototipo",
     resumen: "Tienda en línea de perfumería con catálogo, carrito y pagos con Wompi.",
     stack: ["React", "Node.js / Express", "MySQL", "Wompi"],
     url: "https://eliabperfumes.netlify.app/",

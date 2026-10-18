@@ -72,6 +72,7 @@ const proyectoColumns = {
   reto: schema.proyectos.reto,
   solucion: schema.proyectos.solucion,
   resultado: schema.proyectos.resultado,
+  estado: schema.proyectos.estado,
   imagen: schema.proyectos.imagen,
   imagenAlt: schema.proyectos.imagenAlt,
 };

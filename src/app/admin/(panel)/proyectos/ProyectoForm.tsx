@@ -1,5 +1,5 @@
 import { AdminForm } from "@/components/admin/AdminForm";
-import { Checkbox, Field, Input, Panel, Textarea } from "@/components/admin/fields";
+import { Checkbox, Field, Input, Panel, Select, Textarea } from "@/components/admin/fields";
 import { ImagenField } from "@/components/admin/ImagenField";
 import { guardarProyecto } from "@/lib/admin/actions";
 
@@ -15,6 +15,7 @@ type ProyectoEditable = {
   reto: string;
   solucion: string[];
   resultado: string;
+  estado: "produccion" | "prototipo";
   imagen: string | null;
   imagenAlt: string;
   orden: number;
@@ -34,6 +35,12 @@ export function ProyectoForm({ proyecto: p }: { proyecto?: ProyectoEditable }) {
             <Input name="tipo" defaultValue={p?.tipo} required maxLength={60} />
           </Field>
         </div>
+        <Field label="Estado" hint="se muestra como etiqueta en la tarjeta">
+          <Select name="estado" defaultValue={p?.estado ?? "produccion"}>
+            <option value="produccion">En producción · sitio real publicado</option>
+            <option value="prototipo">Prototipo · navegable, aún no es el sitio final</option>
+          </Select>
+        </Field>
         <Field label="Resumen" hint="una frase para la tarjeta">
           <Textarea name="resumen" rows={2} defaultValue={p?.resumen} required maxLength={300} />
         </Field>
