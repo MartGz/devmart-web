@@ -1,9 +1,9 @@
 import "server-only";
-import { scrypt, timingSafeEqual, type ScryptOptions } from "node:crypto";
+import { randomBytes, scrypt, timingSafeEqual, type ScryptOptions } from "node:crypto";
 
 // Hash de contraseña con scrypt (node:crypto). Formato: scrypt.N.r.p.salt.hash (base64).
 // Se usa «.» como separador porque «$» se expandiría como variable en los archivos .env.
-// El hash lo genera `npm run admin:setup` y se guarda en ADMIN_PASSWORD_HASH.
+// El hash lo genera `npm run admin:setup` (ADMIN_PASSWORD_HASH) o el panel al cambiar la contraseña.
 
 function derive(password: string, salt: Buffer, keylen: number, opts: ScryptOptions) {
   return new Promise<Buffer>((resolve, reject) =>
@@ -21,4 +21,21 @@ export async function verifyPassword(password: string, stored: string): Promise<
     p: Number(p),
   });
   return actual.length === expected.length && timingSafeEqual(actual, expected);
+}
+
+const N = 32768, r = 8, p = 1;
+
+export async function hashPassword(password: string): Promise<string> {
+  const salt = randomBytes(16);
+  const hash = await derive(password, salt, 32, { N, r, p });
+  return ["scrypt", N, r, p, salt.toString("base64"), hash.toString("base64")].join(".");
+}
+
+/** Reglas para una contraseña nueva. Devuelve el error o null. */
+export function problemaPassword(password: string, confirmacion: string, email: string): string | null {
+  if (password.length < 12) return "La contraseña debe tener al menos 12 caracteres.";
+  if (password.length > 200) return "La contraseña es demasiado larga.";
+  if (password !== confirmacion) return "Las dos contraseñas no coinciden.";
+  if (email && password.toLowerCase().includes(email.split("@")[0])) return "No uses tu email dentro de la contraseña.";
+  return null;
 }

@@ -3,6 +3,7 @@
 import { readContacto, validateContacto, type ContactoData, type ContactoState } from "@/lib/contacto";
 import { esBot } from "@/lib/botid";
 import { db, hasDb, schema } from "@/lib/db";
+import { enviarEmail, hayProveedorEmail } from "@/lib/email";
 import { huellaCliente, permitir } from "@/lib/security";
 
 function texto(d: ContactoData) {
@@ -21,26 +22,20 @@ function texto(d: ContactoData) {
 
 /**
  * Envía el mensaje con el primer proveedor configurado:
- * - Resend: RESEND_API_KEY + CONTACT_TO_EMAIL (+ CONTACT_FROM_EMAIL opcional)
+ * - Email (Resend o SMTP, ver src/lib/email.ts) a CONTACT_TO_EMAIL
  * - Formspree: FORMSPREE_ENDPOINT
  * Sin proveedor, en desarrollo solo se registra en la consola.
  */
 async function enviar(d: ContactoData, guardado: boolean): Promise<boolean> {
-  const { RESEND_API_KEY, CONTACT_TO_EMAIL, CONTACT_FROM_EMAIL, FORMSPREE_ENDPOINT } = process.env;
+  const { CONTACT_TO_EMAIL, FORMSPREE_ENDPOINT } = process.env;
 
-  if (RESEND_API_KEY && CONTACT_TO_EMAIL) {
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        from: CONTACT_FROM_EMAIL || "DevMart Web <onboarding@resend.dev>",
-        to: [CONTACT_TO_EMAIL],
-        reply_to: d.email,
-        subject: `Nuevo proyecto: ${d.tipo} — ${d.nombre}`,
-        text: texto(d),
-      }),
+  if (CONTACT_TO_EMAIL && hayProveedorEmail()) {
+    return enviarEmail({
+      to: CONTACT_TO_EMAIL,
+      replyTo: d.email,
+      subject: `Nuevo proyecto: ${d.tipo} — ${d.nombre}`,
+      text: texto(d),
     });
-    return res.ok;
   }
 
   if (FORMSPREE_ENDPOINT) {
@@ -58,7 +53,7 @@ async function enviar(d: ContactoData, guardado: boolean): Promise<boolean> {
     console.info("[contacto] Sin proveedor de envío configurado. Mensaje recibido:\n" + texto(d));
     return true;
   }
-  console.error("[contacto] Falta configurar RESEND_API_KEY/CONTACT_TO_EMAIL o FORMSPREE_ENDPOINT.");
+  console.error("[contacto] Falta configurar CONTACT_TO_EMAIL con Resend/SMTP, o FORMSPREE_ENDPOINT.");
   return false;
 }
 

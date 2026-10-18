@@ -1,6 +1,6 @@
 "use client";
 
-import { startTransition, useActionState, type FormEvent, type ReactNode } from "react";
+import { startTransition, useActionState, useEffect, useRef, type FormEvent, type ReactNode } from "react";
 import { CheckCircle2, Loader2 } from "lucide-react";
 import type { FormState } from "@/lib/admin/actions";
 
@@ -10,13 +10,21 @@ export function AdminForm({
   children,
   submitLabel = "Guardar",
   className = "",
+  resetOnSuccess = false,
 }: {
   action: (prev: FormState, fd: FormData) => Promise<FormState>;
   children: ReactNode;
   submitLabel?: string;
   className?: string;
+  /** Vacía los campos tras guardar bien (p. ej. contraseñas). */
+  resetOnSuccess?: boolean;
 }) {
   const [state, dispatch, pending] = useActionState<FormState, FormData>(action, {});
+  const formRef = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    if (resetOnSuccess && state.ok) formRef.current?.reset();
+  }, [state, resetOnSuccess]);
 
   // Se envía a mano (y no con <form action>) para que React no vacíe los campos al terminar:
   // si hay un error de validación, lo escrito se conserva.
@@ -27,7 +35,7 @@ export function AdminForm({
   }
 
   return (
-    <form onSubmit={onSubmit} className={`flex flex-col gap-6 ${className}`}>
+    <form ref={formRef} onSubmit={onSubmit} className={`flex flex-col gap-6 ${className}`}>
       {state.errors && state.errors.length > 0 && (
         <ul
           role="alert"

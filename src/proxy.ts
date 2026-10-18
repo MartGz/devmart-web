@@ -5,7 +5,8 @@ import { SESSION_COOKIE } from "@/lib/auth/constants";
 // (sello, caducidad, huella de la contraseña) la hace requireAdmin() en cada página y acción.
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  if (pathname === "/admin/login") return NextResponse.next();
+  // Entrar, recuperar la contraseña y crear una nueva no requieren sesión.
+  if (pathname === "/admin/login" || pathname.startsWith("/admin/login/")) return NextResponse.next();
   if (!request.cookies.has(SESSION_COOKIE)) {
     return NextResponse.redirect(new URL("/admin/login", request.url));
   }

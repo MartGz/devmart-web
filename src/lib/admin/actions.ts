@@ -5,7 +5,11 @@ import { updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/auth/dal";
-import { destroySession } from "@/lib/auth/session";
+import { credenciales } from "@/lib/auth/config";
+import { guardarCredenciales } from "@/lib/auth/cuenta";
+import { hashPassword, problemaPassword, verifyPassword } from "@/lib/auth/password";
+import { createSession, destroySession, revocarSesiones } from "@/lib/auth/session";
+import { esSecretoTotp, verifyTotp } from "@/lib/auth/totp";
 import { tiposProyecto } from "@/lib/content";
 import { AJUSTES, TAGS } from "@/lib/data";
 import { db, schema } from "@/lib/db";
@@ -324,4 +328,46 @@ export async function guardarEquipo(_prev: FormState, fd: FormData): Promise<For
   updateTag(TAGS.equipo);
   await registrar("equipo.editado", archivo ? "nueva foto" : quitar ? "foto quitada" : "texto alternativo");
   return { ok: true, message: "Foto del equipo guardada y publicada en el sitio." };
+}
+
+/* ───────────── Cuenta ───────────── */
+
+const leerCampo = (fd: FormData, campo: string) => String(fd.get(campo) ?? "").slice(0, 201);
+const codigoDe = (fd: FormData) => leerCampo(fd, "codigo").replace(/\s/g, "");
+
+/** Cambia la contraseña (pide la actual y, si hay 2FA, el código). Cierra las demás sesiones. */
+export async function cambiarPassword(_prev: FormState, fd: FormData): Promise<FormState> {
+  await requireAdmin();
+  const cfg = await credenciales();
+  const actualOk = await verifyPassword(leerCampo(fd, "actual"), cfg.passwordHash);
+  if (!actualOk || (cfg.totpSecret && !verifyTotp(cfg.totpSecret, codigoDe(fd)))) {
+    await registrar("password.cambio_fallido");
+    return { ok: false, errors: ["La contraseña actual o el código no son correctos."] };
+  }
+  const nueva = leerCampo(fd, "nueva");
+  const problema = problemaPassword(nueva, leerCampo(fd, "confirmacion"), cfg.email);
+  if (problema) return { ok: false, errors: [problema] };
+
+  await guardarCredenciales({ passwordHash: await hashPassword(nueva) });
+  await revocarSesiones();
+  await createSession();
+  await registrar("password.cambiada");
+  return { ok: true, message: "Contraseña cambiada. Las demás sesiones se cerraron." };
+}
+
+/** Vincula de nuevo la app de autenticación (p. ej. al cambiar de teléfono). */
+export async function reconfigurarTotp(_prev: FormState, fd: FormData): Promise<FormState> {
+  await requireAdmin();
+  const cfg = await credenciales();
+  if (!(await verifyPassword(leerCampo(fd, "actual"), cfg.passwordHash))) {
+    await registrar("totp.cambio_fallido");
+    return { ok: false, errors: ["La contraseña actual no es correcta."] };
+  }
+  const secreto = leerCampo(fd, "secreto");
+  if (!esSecretoTotp(secreto) || !verifyTotp(secreto, codigoDe(fd))) {
+    return { ok: false, errors: ["El código de 6 dígitos no coincide con el QR de esta página."] };
+  }
+  await guardarCredenciales({ totpSecret: secreto });
+  await registrar("totp.cambiado");
+  return { ok: true, message: "App de autenticación vinculada. Usa sus códigos desde ahora." };
 }

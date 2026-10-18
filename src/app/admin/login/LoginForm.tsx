@@ -1,11 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState } from "react";
 import { Loader2, LockKeyhole } from "lucide-react";
 import { iniciarSesion, type LoginState } from "./actions";
-
-const inputCls =
-  "w-full rounded-xl border border-borde bg-blanco px-4 py-3.5 text-[16px] text-noche transition-colors hover:border-niebla focus:border-cielo-profundo focus:outline-none";
+import { inputCls } from "./Tarjeta";
 
 export function LoginForm({ conTotp }: { conTotp: boolean }) {
   const [state, action, pending] = useActionState<LoginState, FormData>(iniciarSesion, {});
@@ -20,10 +19,15 @@ export function LoginForm({ conTotp }: { conTotp: boolean }) {
         Email
         <input name="email" type="email" autoComplete="username" required className={inputCls} />
       </label>
-      <label className="flex flex-col gap-2 text-[15px] font-medium text-noche">
-        Contraseña
-        <input name="password" type="password" autoComplete="current-password" required className={inputCls} />
-      </label>
+      <div className="flex flex-col gap-2">
+        <label className="flex flex-col gap-2 text-[15px] font-medium text-noche">
+          Contraseña
+          <input name="password" type="password" autoComplete="current-password" required className={inputCls} />
+        </label>
+        <Link href="/admin/login/recuperar" className="w-fit text-[14px] text-cielo-profundo hover:text-noche">
+          ¿Olvidaste tu contraseña?
+        </Link>
+      </div>
       {conTotp && (
         <label className="flex flex-col gap-2 text-[15px] font-medium text-noche">
           Código de verificación

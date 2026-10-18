@@ -5,5 +5,7 @@ initBotId({
   protect: [
     { path: "/contacto", method: "POST" },
     { path: "/admin/login", method: "POST" },
+    { path: "/admin/login/recuperar", method: "POST" },
+    { path: "/admin/login/nueva", method: "POST" },
   ],
 });
