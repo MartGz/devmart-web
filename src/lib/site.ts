@@ -30,3 +30,25 @@ export function whatsappHref(message = "Hola DevMart, tengo una idea y quiero co
 }
 
 export const hasWhatsapp = whatsappNumber.length > 0;
+
+/** Coordenadas del estudio (Cartagena de Indias) que muestra el pie. */
+export const coordenadas = "10.39° N · 75.48° O";
+
+export type RedSocial = "instagram" | "linkedin" | "tiktok" | "facebook" | "github" | "x";
+
+/**
+ * Perfiles en redes. Cada uno aparece en el pie solo cuando su variable tiene la URL del perfil.
+ * Se leen por nombre completo para que Next.js las incruste en el cliente.
+ */
+const perfiles: { red: RedSocial; label: string; url: string | undefined }[] = [
+  { red: "instagram", label: "Instagram", url: process.env.NEXT_PUBLIC_INSTAGRAM },
+  { red: "linkedin", label: "LinkedIn", url: process.env.NEXT_PUBLIC_LINKEDIN },
+  { red: "tiktok", label: "TikTok", url: process.env.NEXT_PUBLIC_TIKTOK },
+  { red: "facebook", label: "Facebook", url: process.env.NEXT_PUBLIC_FACEBOOK },
+  { red: "github", label: "GitHub", url: process.env.NEXT_PUBLIC_GITHUB },
+  { red: "x", label: "X", url: process.env.NEXT_PUBLIC_X },
+];
+
+export const redes = perfiles
+  .filter((p): p is typeof p & { url: string } => !!p.url && /^https:\/\//.test(p.url))
+  .map(({ red, label, url }) => ({ red, label, url }));
