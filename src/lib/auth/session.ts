@@ -80,3 +80,36 @@ export async function revocarSesiones() {
     .values({ clave: minIatClave(), valor: ahora })
     .onConflictDoUpdate({ target: schema.ajustes.clave, set: { valor: ahora } });
 }
+
+/* Inicio de sesión en dos pasos: tras validar email y contraseña queda una cookie corta que
+   solo sirve para pedir el código de la app (no da acceso al panel). */
+
+const PASO_COOKIE = "dm_login_paso";
+const PASO_MINUTOS = 5;
+
+type PasoData = { paso: "codigo"; exp: number; k: string };
+
+export async function crearPasoPendiente() {
+  const { passwordHash, sessionSecret } = await credenciales();
+  const ttl = PASO_MINUTOS * 60;
+  const data: PasoData = { paso: "codigo", exp: Date.now() + ttl * 1000, k: huella(passwordHash) };
+  const sealed = await sealData(data, { password: sessionSecret, ttl });
+  (await cookies()).set(PASO_COOKIE, sealed, { ...cookieOptions, path: "/admin/login", maxAge: ttl });
+}
+
+/** La contraseña se validó hace menos de 5 minutos y no ha cambiado desde entonces. */
+export async function pasoPendienteValido(): Promise<boolean> {
+  const raw = (await cookies()).get(PASO_COOKIE)?.value;
+  if (!raw) return false;
+  const cfg = await credenciales();
+  try {
+    const data = await unsealData<Partial<PasoData>>(raw, { password: cfg.sessionSecret });
+    return data.paso === "codigo" && typeof data.exp === "number" && data.exp > Date.now() && data.k === huella(cfg.passwordHash);
+  } catch {
+    return false;
+  }
+}
+
+export async function borrarPasoPendiente() {
+  (await cookies()).set(PASO_COOKIE, "", { ...cookieOptions, path: "/admin/login", maxAge: 0 });
+}

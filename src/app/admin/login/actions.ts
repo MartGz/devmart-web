@@ -4,23 +4,26 @@ import { redirect } from "next/navigation";
 import { credenciales } from "@/lib/auth/config";
 import { anularTokenRecuperacion, crearTokenRecuperacion, guardarCredenciales, MINUTOS_ENLACE, tokenValido } from "@/lib/auth/cuenta";
 import { hashPassword, problemaPassword, verifyPassword } from "@/lib/auth/password";
-import { createSession, revocarSesiones } from "@/lib/auth/session";
+import { borrarPasoPendiente, crearPasoPendiente, createSession, pasoPendienteValido, revocarSesiones } from "@/lib/auth/session";
 import { esSecretoTotp, verifyTotp } from "@/lib/auth/totp";
 import { esBot } from "@/lib/botid";
 import { enviarEmail, hayProveedorEmail } from "@/lib/email";
 import { huellaCliente, permitir, registrar, reiniciar } from "@/lib/security";
 import { siteUrl } from "@/lib/site";
 
-export type LoginState = { error?: string; ok?: boolean; message?: string };
+export type LoginState = { error?: string; ok?: boolean; message?: string; paso?: "codigo" };
 
 // Hash de relleno para que un email incorrecto tarde lo mismo que una contraseña incorrecta.
 const DUMMY_HASH = "scrypt.32768.8.1.AAAAAAAAAAAAAAAAAAAAAA==.AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
-const GENERICO = "Email, contraseña o código incorrectos.";
 const BOT = "No pudimos verificar tu navegador. Inténtalo de nuevo.";
 
 const leer = (fd: FormData, campo: string, max = 200) => String(fd.get(campo) ?? "").slice(0, max);
 const codigoDe = (fd: FormData) => leer(fd, "codigo", 10).replace(/\s/g, "");
 
+/**
+ * Entrar en dos pasos: primero email y contraseña; si hay verificación en dos pasos, después
+ * el código de la app (con una cookie de 5 minutos que solo vale para ese segundo paso).
+ */
 export async function iniciarSesion(_prev: LoginState, fd: FormData): Promise<LoginState> {
   const cfg = await credenciales();
   if (!cfg.ready) return { error: "Aún no hay contraseña. Usa «¿Olvidaste tu contraseña?» para crearla." };
@@ -35,20 +38,34 @@ export async function iniciarSesion(_prev: LoginState, fd: FormData): Promise<Lo
     return { error: "Demasiados intentos. Espera 15 minutos antes de volver a intentarlo." };
   }
 
-  const email = leer(fd, "email", 254).trim().toLowerCase();
-  const password = leer(fd, "password");
-  const codigo = codigoDe(fd);
-
-  const emailOk = email === cfg.email;
-  const passwordOk = await verifyPassword(password, emailOk ? cfg.passwordHash : DUMMY_HASH);
-  const totpOk = !cfg.totpSecret || verifyTotp(cfg.totpSecret, codigo);
-
-  if (!(emailOk && passwordOk && totpOk)) {
-    await registrar("login.fallido", huella);
-    return { error: GENERICO };
+  if (leer(fd, "paso", 10) === "codigo") {
+    if (!(await pasoPendienteValido())) {
+      await borrarPasoPendiente();
+      return { error: "Pasaron más de 5 minutos. Escribe de nuevo tu email y contraseña." };
+    }
+    if (!cfg.totpSecret || !verifyTotp(cfg.totpSecret, codigoDe(fd))) {
+      await registrar("login.codigo_incorrecto", huella);
+      return { paso: "codigo", error: "El código no es correcto. Usa el que muestra ahora tu app (cambia cada 30 segundos)." };
+    }
+    return entrar(porCliente, huella);
   }
 
+  const email = leer(fd, "email", 254).trim().toLowerCase();
+  const emailOk = email === cfg.email;
+  const passwordOk = await verifyPassword(leer(fd, "password"), emailOk ? cfg.passwordHash : DUMMY_HASH);
+  if (!(emailOk && passwordOk)) {
+    await registrar("login.fallido", huella);
+    return { error: "Email o contraseña incorrectos." };
+  }
+  if (!cfg.totpSecret) return entrar(porCliente, huella);
+
+  await crearPasoPendiente();
+  return { paso: "codigo" };
+}
+
+async function entrar(porCliente: string, huella: string): Promise<never> {
   await reiniciar(porCliente);
+  await borrarPasoPendiente();
   await createSession();
   await registrar("login", huella);
   redirect("/admin");
