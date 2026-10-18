@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
+import { ArrowLeft } from "lucide-react";
 import { credenciales } from "@/lib/auth/config";
 import { LoginForm } from "./LoginForm";
 import { Aviso, Tarjeta } from "./Tarjeta";
@@ -9,10 +10,13 @@ export const metadata: Metadata = { title: "Entrar" };
 
 export default function LoginPage({ searchParams }: PageProps<"/admin/login">) {
   return (
-    <Tarjeta titulo="Panel de administración" intro="Acceso solo para el equipo de DevMart.">
+    <Tarjeta titulo="Bienvenido de vuelta" intro="Acceso solo para el equipo de DevMart.">
       <Suspense fallback={<div className="h-80 animate-pulse rounded-xl bg-nube" aria-label="Cargando" />}>
         <Acceso searchParams={searchParams} />
       </Suspense>
+      <Link href="/" className="inline-flex w-fit items-center gap-2 text-[15px] text-pizarra hover:text-noche">
+        <ArrowLeft size={18} strokeWidth={1.5} aria-hidden /> Volver al sitio
+      </Link>
     </Tarjeta>
   );
 }
