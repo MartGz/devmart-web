@@ -5,7 +5,7 @@ import { Cube } from "./Cube";
 import { HoraLocal } from "./HoraLocal";
 import { SocialIcon } from "./SocialIcon";
 import { servicios } from "@/lib/content";
-import { coordenadas, hasWhatsapp, nav, redes, site, whatsappHref } from "@/lib/site";
+import { coordenadas, nav, redes, site, WHATSAPP_VISIBLE, whatsappHref } from "@/lib/site";
 
 // Pie como ficha técnica: cuatro columnas numeradas separadas por líneas finas y, al final,
 // el wordmark a escala de cartel cortado por el borde inferior.
@@ -53,12 +53,16 @@ export function Footer() {
           )}
           <a
             href={whatsappHref()}
-            data-track-whatsapp="footer"
-            {...(hasWhatsapp ? enlacesExternos : {})}
-            className="btn-primary w-full"
+            {...enlacesExternos}
+            data-track-whatsapp="footer-numero"
+            aria-label={`Escribir a DevMart Solutions por WhatsApp al ${WHATSAPP_VISIBLE}`}
+            className="w-fit font-mono text-[15px] tracking-[0.04em] text-niebla transition-colors hover:text-cielo"
           >
-            {hasWhatsapp && <SocialIcon red="whatsapp" size={20} />}
-            {hasWhatsapp ? "Escríbenos por WhatsApp" : "Cuéntanos tu idea"}
+            {WHATSAPP_VISIBLE}
+          </a>
+          <a href={whatsappHref()} data-track-whatsapp="footer" {...enlacesExternos} className="btn-primary w-full">
+            <SocialIcon red="whatsapp" size={20} />
+            Escríbenos por WhatsApp
           </a>
         </div>
       </div>
@@ -90,37 +94,31 @@ export function Footer() {
           </Columna>
 
           <Columna n="03" titulo="Redes" className="border-t sm:pr-7 lg:border-t-0 lg:border-l lg:pl-7">
-            {redes.length > 0 || hasWhatsapp ? (
-              <ul className="grid max-w-[240px] grid-cols-3 gap-2">
-                {redes.map((r) => (
-                  <li key={r.red}>
-                    <a
-                      href={r.url}
-                      {...enlacesExternos}
-                      aria-label={`DevMart en ${r.label}`}
-                      className="flex h-14 items-center justify-center rounded-xl border border-white/15 transition-colors duration-150 hover:border-cielo hover:bg-cielo hover:text-noche md:h-16"
-                    >
-                      <SocialIcon red={r.red} />
-                    </a>
-                  </li>
-                ))}
-                {hasWhatsapp && (
-                  <li>
-                    <a
-                      href={whatsappHref()}
-                      {...enlacesExternos}
-                      data-track-whatsapp="footer-redes"
-                      aria-label="DevMart en WhatsApp"
-                      className="flex h-14 items-center justify-center rounded-xl border border-white/15 transition-colors duration-150 hover:border-cielo hover:bg-cielo hover:text-noche md:h-16"
-                    >
-                      <SocialIcon red="whatsapp" />
-                    </a>
-                  </li>
-                )}
-              </ul>
-            ) : (
-              <p className="text-[17px] text-niebla">Muy pronto.</p>
-            )}
+            <ul className="grid max-w-[240px] grid-cols-3 gap-2">
+              {redes.map((r) => (
+                <li key={r.red}>
+                  <a
+                    href={r.url}
+                    {...enlacesExternos}
+                    aria-label={`DevMart en ${r.label}`}
+                    className="flex h-14 items-center justify-center rounded-xl border border-white/15 transition-colors duration-150 hover:border-cielo hover:bg-cielo hover:text-noche md:h-16"
+                  >
+                    <SocialIcon red={r.red} />
+                  </a>
+                </li>
+              ))}
+              <li>
+                <a
+                  href={whatsappHref()}
+                  {...enlacesExternos}
+                  data-track-whatsapp="footer-redes"
+                  aria-label="Escribir a DevMart Solutions por WhatsApp"
+                  className="flex h-14 items-center justify-center rounded-xl border border-white/15 transition-colors duration-150 hover:border-cielo hover:bg-cielo hover:text-noche md:h-16"
+                >
+                  <SocialIcon red="whatsapp" />
+                </a>
+              </li>
+            </ul>
           </Columna>
 
           <Columna n="04" titulo="Estudio" className="border-t sm:border-l sm:pl-7 lg:border-t-0">
@@ -145,7 +143,7 @@ export function Footer() {
       </div>
 
       <div className="relative border-t border-white/15 bg-noche">
-        <div className="container-dm flex flex-col gap-3 pt-6 pb-24 font-mono text-xs text-niebla md:flex-row md:pb-6 md:items-center md:justify-between">
+        <div className="container-dm flex flex-col gap-3 pt-6 pb-44 font-mono text-xs text-niebla md:flex-row md:items-center md:justify-between md:pr-28 md:pb-6">
           <span>© 2026 {site.name} · {site.city}</span>
           <Link href="/privacidad" className="transition-colors hover:text-cielo">
             Privacidad y cookies · Ley 1581 de 2012

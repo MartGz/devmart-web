@@ -100,7 +100,6 @@ Ver `.env.example`.
 | `ADMIN_EMAIL`, `ADMIN_PASSWORD_HASH`, `ADMIN_TOTP_SECRET`, `SESSION_SECRET` | Acceso al panel. Las genera `npm run admin:setup`. |
 | `NEXT_PUBLIC_SITE_URL` | URL pública (sitemap, Open Graph, JSON-LD). Sin ella se usa `http://localhost:3000`. |
 | `NEXT_PUBLIC_EMAIL` | Email de contacto que se muestra en el sitio. |
-| `NEXT_PUBLIC_WHATSAPP` | Número de WhatsApp Business, solo dígitos con indicativo (`57…`). Sin él, los botones llevan a `/contacto`. |
 | `RESEND_API_KEY`, `CONTACT_TO_EMAIL`, `CONTACT_FROM_EMAIL` | Aviso por email de cada mensaje (Resend). Opcional: los mensajes ya quedan en el panel. |
 | `FORMSPREE_ENDPOINT` | Alternativa a Resend. |
 | `NEXT_PUBLIC_GA_ID` | Google Analytics 4. Se carga solo si la persona acepta las cookies. |

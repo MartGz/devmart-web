@@ -4,7 +4,9 @@ import Link from "next/link";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { SendHorizontal, X } from "lucide-react";
 import { Cube } from "./Cube";
+import { SocialIcon } from "./SocialIcon";
 import { responder, saludo, sugerencias, type Respuesta } from "@/lib/asistente";
+import { whatsappHref } from "@/lib/site";
 
 type Mensaje = { de: "bot" | "tu"; r: Respuesta; id: number };
 
@@ -64,7 +66,7 @@ export function Asistente() {
           id="asistente"
           role="dialog"
           aria-label="Asistente de DevMart"
-          className="fixed inset-x-3 bottom-[92px] z-40 flex max-h-[min(560px,calc(100dvh-120px))] flex-col overflow-hidden rounded-[22px] bg-blanco shadow-[0_24px_60px_rgba(11,13,18,0.18)] sm:inset-x-auto sm:right-8 sm:bottom-[108px] sm:w-[380px]"
+          className="fixed inset-x-3 bottom-[calc(92px+env(safe-area-inset-bottom))] z-40 flex max-h-[min(560px,calc(100dvh-120px))] flex-col overflow-hidden rounded-[22px] bg-blanco shadow-[0_24px_60px_rgba(11,13,18,0.18)] sm:inset-x-auto sm:right-8 sm:bottom-[108px] sm:w-[380px]"
         >
           <div className="flex items-center gap-3 bg-noche py-4 pr-3 pl-[18px] text-nube">
             <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#161B25]">
@@ -134,30 +136,45 @@ export function Asistente() {
         </div>
       )}
 
-      <div className="fixed right-5 bottom-5 z-40 flex items-center gap-3 md:right-8 md:bottom-8">
-        {!visto && !abierto && (
+      {/* Respeta el área segura del móvil (barra de inicio, bordes redondeados). */}
+      <div className="fixed right-[calc(1.25rem+env(safe-area-inset-right))] bottom-[calc(1.25rem+env(safe-area-inset-bottom))] z-40 flex flex-col items-end gap-3 md:right-8 md:bottom-8">
+        {!abierto && (
+          <a
+            href={whatsappHref()}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-track-whatsapp="flotante"
+            aria-label="Escribir a DevMart Solutions por WhatsApp"
+            className="flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-noche shadow-[0_12px_32px_rgba(11,13,18,0.2)] transition-transform duration-150 hover:scale-105 motion-reduce:transition-none"
+          >
+            <SocialIcon red="whatsapp" size={26} />
+          </a>
+        )}
+        <div className="flex items-center gap-3">
+          {!visto && !abierto && (
+            <button
+              type="button"
+              onClick={abrir}
+              className="hidden rounded-full border border-borde bg-blanco px-3.5 py-2 text-[14px] text-noche shadow-[0_8px_24px_rgba(11,13,18,0.08)] sm:block"
+            >
+              ¿Dudas? Pregúntame
+            </button>
+          )}
           <button
             type="button"
             onClick={abrir}
-            className="hidden rounded-full border border-borde bg-blanco px-3.5 py-2 text-[14px] text-noche shadow-[0_8px_24px_rgba(11,13,18,0.08)] sm:block"
+            aria-label={abierto ? "Cerrar asistente" : "Abrir asistente de DevMart"}
+            aria-expanded={abierto}
+            aria-controls="asistente"
+            className="group flex h-[60px] w-[60px] items-center justify-center rounded-full border border-white/20 bg-noche shadow-[0_12px_32px_rgba(11,13,18,0.25)] transition-transform duration-150 hover:scale-105 motion-reduce:transition-none"
           >
-            ¿Dudas? Pregúntame
+            {abierto ? (
+              <X size={24} strokeWidth={1.5} className="text-blanco" aria-hidden />
+            ) : (
+              <Cube size={26} variant="dark" className="transition-transform duration-300 group-hover:-translate-y-0.5" />
+            )}
           </button>
-        )}
-        <button
-          type="button"
-          onClick={abrir}
-          aria-label={abierto ? "Cerrar asistente" : "Abrir asistente de DevMart"}
-          aria-expanded={abierto}
-          aria-controls="asistente"
-          className="group flex h-[60px] w-[60px] items-center justify-center rounded-full border border-white/20 bg-noche shadow-[0_12px_32px_rgba(11,13,18,0.25)] transition-transform duration-150 hover:scale-105 motion-reduce:transition-none"
-        >
-          {abierto ? (
-            <X size={24} strokeWidth={1.5} className="text-blanco" aria-hidden />
-          ) : (
-            <Cube size={26} variant="dark" className="transition-transform duration-300 group-hover:-translate-y-0.5" />
-          )}
-        </button>
+        </div>
       </div>
     </>
   );

@@ -1,16 +1,19 @@
-import { site, siteUrl } from "@/lib/site";
+import { redes, site, siteUrl, WHATSAPP_VISIBLE } from "@/lib/site";
 
-// Datos estructurados de la empresa. Teléfono y redes se añadirán cuando estén definidos.
-export function OrganizationJsonLd() {
+// Datos estructurados del estudio. DevMart no es una sociedad registrada: se describe como un
+// servicio profesional local (sin «Organization» ni datos legales), con teléfono y redes.
+export function EstudioJsonLd() {
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": ["Organization", "LocalBusiness"],
-    "@id": `${siteUrl}/#organization`,
+    "@type": "ProfessionalService",
+    "@id": `${siteUrl}/#estudio`,
     name: site.name,
     url: siteUrl,
     logo: `${siteUrl}/logo-cube.svg`,
     description: site.description,
+    telephone: WHATSAPP_VISIBLE,
     ...(site.email && { email: site.email }),
+    ...(redes.length > 0 && { sameAs: redes.map((r) => r.url) }),
     address: {
       "@type": "PostalAddress",
       addressLocality: site.city,

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Cube } from "./Cube";
-import { hasWhatsapp, whatsappHref } from "@/lib/site";
+import { whatsappHref } from "@/lib/site";
 
 /** Etiqueta mono con prefijo «// ». */
 export function Label({ children, className = "text-cielo-profundo" }: { children: ReactNode; className?: string }) {
@@ -79,7 +79,8 @@ export function WhatsAppLink({
     <a
       href={whatsappHref(message)}
       data-track-whatsapp={track}
-      {...(hasWhatsapp ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+      target="_blank"
+      rel="noopener noreferrer"
       className={className}
     >
       {children}

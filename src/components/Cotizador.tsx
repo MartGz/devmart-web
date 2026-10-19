@@ -5,7 +5,7 @@ import { useState, type ReactNode } from "react";
 import { MessageCircle } from "lucide-react";
 import { track } from "@/lib/analytics";
 import { complejidad, funcionalidades, plazos, tamanos, tiposCotizador } from "@/lib/cotizador";
-import { hasWhatsapp, whatsappHref } from "@/lib/site";
+import { whatsappHref } from "@/lib/site";
 import { Label } from "./ui";
 
 const optionCls =
@@ -168,9 +168,7 @@ export function Cotizador() {
                 primera conversación.
               </p>
               <div className="flex flex-col gap-3">
-                {/* Sin número de WhatsApp, el formulario es la única vía (lleva el resumen). */}
-                {hasWhatsapp && (
-                  <a
+                <a
                     href={whatsappHref(`Hola DevMart, armé mi proyecto en el cotizador:\n\n${resumen}`)}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -179,13 +177,12 @@ export function Cotizador() {
                   >
                     <MessageCircle size={18} strokeWidth={1.5} aria-hidden /> Enviar por WhatsApp
                   </a>
-                )}
                 <Link
                   href={formHref}
                   onClick={() => track("cotizador_enviado", { canal: "formulario", tipo: tipo.label, nivel: nivel.nivel })}
-                  className={`${hasWhatsapp ? "btn-secondary-dark" : "btn-primary"} w-full`}
+                  className="btn-secondary-dark w-full"
                 >
-                  {hasWhatsapp ? "Seguir en el formulario" : "Enviar mi proyecto"}
+                  Seguir en el formulario
                 </Link>
               </div>
             </>

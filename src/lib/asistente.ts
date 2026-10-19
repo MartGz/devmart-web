@@ -1,5 +1,5 @@
 import { proceso, servicios } from "./content";
-import { hasWhatsapp, site, whatsappHref } from "./site";
+import { site, WHATSAPP_VISIBLE, whatsappHref } from "./site";
 
 // Asistente del sitio: responde dudas frecuentes con el contenido del propio sitio (sin IA y sin
 // costo). Busca palabras clave en la pregunta; si no entiende, ofrece hablar con una persona.
@@ -16,7 +16,7 @@ export const saludo: Respuesta = {
 
 function contacto(): Enlace[] {
   return [
-    ...(hasWhatsapp ? [{ label: "Escribir por WhatsApp", href: whatsappHref(), externo: true }] : []),
+    { label: `WhatsApp ${WHATSAPP_VISIBLE}`, href: whatsappHref(), externo: true },
     { label: "Dejar mi idea en el formulario", href: "/contacto" },
     ...(site.email ? [{ label: site.email, href: `mailto:${site.email}`, externo: true }] : []),
   ];

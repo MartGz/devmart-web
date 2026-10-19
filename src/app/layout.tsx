@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Outfit, Unbounded, JetBrains_Mono } from "next/font/google";
-import { OrganizationJsonLd } from "@/components/JsonLd";
+import { EstudioJsonLd } from "@/components/JsonLd";
 import { site, siteUrl } from "@/lib/site";
 import "./globals.css";
 
@@ -41,7 +41,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="flex min-h-full flex-col">
         {children}
-        <OrganizationJsonLd />
+        <EstudioJsonLd />
       </body>
     </html>
   );

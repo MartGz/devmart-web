@@ -18,18 +18,18 @@ export const nav = [
   { href: "/precios", label: "Precios" },
 ] as const;
 
-/**
- * Número de WhatsApp Business en formato internacional sin «+» (p. ej. 573001234567).
- * Mientras no esté definido, los botones de WhatsApp llevan a /contacto.
- */
-const whatsappNumber = (process.env.NEXT_PUBLIC_WHATSAPP ?? "").replace(/\D/g, "");
+/** WhatsApp Business de DevMart en formato internacional sin «+». Único lugar donde vive el número. */
+export const WHATSAPP_NUMERO = "573137135653";
 
-export function whatsappHref(message = "Hola DevMart, tengo una idea y quiero contarles.") {
-  if (!whatsappNumber) return "/contacto";
-  return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+/** El mismo número como se muestra a los visitantes. */
+export const WHATSAPP_VISIBLE = "+57 313 713 5653";
+
+/** Mensaje con el que se abre la conversación desde el sitio. */
+export const WHATSAPP_MENSAJE = "Hola, vengo desde la página de DevMart Solutions y quiero información sobre sus servicios.";
+
+export function whatsappHref(message = WHATSAPP_MENSAJE) {
+  return `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(message)}`;
 }
-
-export const hasWhatsapp = whatsappNumber.length > 0;
 
 /** Coordenadas del estudio (Cartagena de Indias) que muestra el pie. */
 export const coordenadas = "10.39° N · 75.48° O";

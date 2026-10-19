@@ -6,7 +6,7 @@ import { ContactForm, ContactFormWithParams } from "@/components/ContactForm";
 import { CopyEmail } from "@/components/CopyEmail";
 import { HoraLocal } from "@/components/HoraLocal";
 import { Label } from "@/components/ui";
-import { hasWhatsapp, redes, site, whatsappHref } from "@/lib/site";
+import { redes, site, WHATSAPP_VISIBLE, whatsappHref } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Contacto",
@@ -50,13 +50,29 @@ export default function ContactoPage() {
             <div className="mt-4 flex flex-col border-b border-white/15">
               <Canal
                 etiqueta="WhatsApp"
-                valor={hasWhatsapp ? "Escríbenos" : "Muy pronto"}
+                valor={
+                  <a
+                    href={whatsappHref()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-track-whatsapp="contacto-numero"
+                    aria-label={`Escribir a DevMart Solutions por WhatsApp al ${WHATSAPP_VISIBLE}`}
+                    className="hover:text-cielo"
+                  >
+                    {WHATSAPP_VISIBLE}
+                  </a>
+                }
                 accion={
-                  hasWhatsapp ? (
-                    <a href={whatsappHref()} target="_blank" rel="noopener noreferrer" data-track-whatsapp="contacto" className={accionCls}>
-                      Abrir <ArrowUpRight size={14} strokeWidth={1.5} aria-hidden />
-                    </a>
-                  ) : undefined
+                  <a
+                    href={whatsappHref()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-track-whatsapp="contacto"
+                    aria-label="Escribir a DevMart Solutions por WhatsApp"
+                    className={accionCls}
+                  >
+                    Abrir <ArrowUpRight size={14} strokeWidth={1.5} aria-hidden />
+                  </a>
                 }
               />
               {site.email && (
