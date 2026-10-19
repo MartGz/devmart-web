@@ -1,0 +1,22 @@
+{
+  // Espacio de trabajo de DevMart. Ábrelo con «Archivo → Abrir área de trabajo desde archivo…».
+  // La primera carpeta es el proyecto completo; las demás son accesos directos a cada parte.
+  "folders": [
+    { "name": "📦 Proyecto completo", "path": "." },
+    { "name": "🌐 Sitio público (páginas)", "path": "src/app/(sitio)" },
+    { "name": "🔐 Panel /admin", "path": "src/app/admin" },
+    { "name": "🧩 Componentes", "path": "src/components" },
+    { "name": "⚙️ Lógica, datos y seguridad", "path": "src/lib" },
+    { "name": "📝 Artículos del blog", "path": "src/content/blog" },
+    { "name": "🎨 Identidad visual", "path": "Identidad visual DevMart Solutions" },
+    { "name": "📖 Documentación", "path": "docs" }
+  ],
+  "settings": {
+    "workbench.startupEditor": "none",
+    "explorer.fileNesting.enabled": true,
+    "explorer.fileNesting.patterns": {
+      "package.json": "package-lock.json, tsconfig.json, next-env.d.ts, eslint.config.mjs, drizzle.config.ts, skills-lock.json",
+      ".env.example": ".env, .env.local"
+    }
+  }
+}

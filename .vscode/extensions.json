@@ -1,0 +1,11 @@
+{
+  // VS Code las sugiere al abrir el proyecto: autocompletado de Tailwind, errores de ESLint en el editor
+  // y vista de la base de datos y de los cambios de Git.
+  "recommendations": [
+    "bradlc.vscode-tailwindcss",
+    "dbaeumer.vscode-eslint",
+    "eamodio.gitlens",
+    "yoavbls.pretty-ts-errors",
+    "usernamehw.errorlens"
+  ]
+}
