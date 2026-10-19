@@ -25,29 +25,29 @@ const instagram = redes.find((r) => r.red === "instagram");
 /** Fila de canal de contacto: etiqueta mono, valor grande y acción a la derecha. */
 function Canal({ etiqueta, valor, accion }: { etiqueta: string; valor: ReactNode; accion?: ReactNode }) {
   return (
-    <div className="flex items-center gap-3 border-t border-white/15 py-[18px] sm:gap-4">
-      <span className="w-[76px] shrink-0 font-mono text-[10px] tracking-[0.12em] text-niebla uppercase sm:w-24 sm:text-[11px]">{etiqueta}</span>
+    <div className="flex items-center gap-3 border-t border-noche/15 py-[18px] sm:gap-4">
+      <span className="w-[76px] shrink-0 font-mono text-[10px] tracking-[0.12em] text-pizarra uppercase sm:w-24 sm:text-[11px]">{etiqueta}</span>
       <span className="min-w-0 flex-1 truncate font-display text-base font-medium tracking-[-0.04em] sm:text-lg md:text-xl">{valor}</span>
       {accion}
     </div>
   );
 }
 
-const accionCls = "inline-flex shrink-0 items-center gap-1 font-mono text-[11px] tracking-[0.12em] text-cielo uppercase hover:text-nube";
+const accionCls = "inline-flex shrink-0 items-center gap-1 font-mono text-[11px] tracking-[0.12em] text-cielo-profundo uppercase hover:text-noche";
 
 export default function ContactoPage() {
   return (
     <>
-      {/* Sube bajo la cabecera flotante para que la cápsula quede sobre el fondo oscuro. */}
-      <section className="-mt-[68px] bg-noche pt-[116px] text-nube md:-mt-20 md:pt-[152px]">
+      {/* Sube bajo la cabecera flotante para que la cápsula quede sobre el fondo de la sección. */}
+      <section className="-mt-[68px] bg-cielo-tinte pt-[116px] pb-16 text-noche md:-mt-20 md:pt-[152px] md:pb-24">
         <div className="container-dm grid gap-12 lg:grid-cols-2 lg:items-start lg:gap-16">
-          <div className="flex min-w-0 flex-col gap-6 lg:pb-[72px]">
-            <Label className="text-cielo">Contacto</Label>
+          <div className="flex min-w-0 flex-col gap-6">
+            <Label>Contacto</Label>
             <h1 className="h1-hero">Cuéntanos tu idea.</h1>
-            <p className="max-w-[480px] text-lg leading-[1.55] text-[#C9CFD8] text-pretty">
+            <p className="max-w-[480px] text-lg leading-[1.55] text-pizarra text-pretty">
               Te respondemos con preguntas, un plan y un presupuesto orientativo. Sin compromiso.
             </p>
-            <div className="mt-4 flex flex-col border-b border-white/15">
+            <div className="mt-4 flex flex-col border-b border-noche/15">
               <Canal
                 etiqueta="WhatsApp"
                 valor={
@@ -57,7 +57,7 @@ export default function ContactoPage() {
                     rel="noopener noreferrer"
                     data-track-whatsapp="contacto-numero"
                     aria-label={`Escribir a DevMart Solutions por WhatsApp al ${WHATSAPP_VISIBLE}`}
-                    className="hover:text-cielo"
+                    className="hover:text-cielo-profundo"
                   >
                     {WHATSAPP_VISIBLE}
                   </a>
@@ -79,18 +79,18 @@ export default function ContactoPage() {
                 <Canal
                   etiqueta="Email"
                   valor={
-                    <a href={`mailto:${site.email}`} className="hover:text-cielo">
+                    <a href={`mailto:${site.email}`} className="hover:text-cielo-profundo">
                       {site.email}
                     </a>
                   }
-                  accion={<CopyEmail email={site.email} compact />}
+                  accion={<CopyEmail email={site.email} compact tono="claro" />}
                 />
               )}
               {instagram && (
                 <Canal
                   etiqueta="Instagram"
                   valor={
-                    <a href={instagram.url} target="_blank" rel="noopener noreferrer" className="hover:text-cielo">
+                    <a href={instagram.url} target="_blank" rel="noopener noreferrer" className="hover:text-cielo-profundo">
                       @devmart.co
                     </a>
                   }
@@ -105,7 +105,7 @@ export default function ContactoPage() {
                 etiqueta="Estudio"
                 valor="Cartagena"
                 accion={
-                  <span className="shrink-0 font-mono text-[11px] tracking-[0.12em] text-niebla uppercase">
+                  <span className="shrink-0 font-mono text-[11px] tracking-[0.12em] text-pizarra uppercase">
                     CTG · <HoraLocal />
                   </span>
                 }
@@ -113,10 +113,10 @@ export default function ContactoPage() {
             </div>
           </div>
 
-          <div className="relative min-w-0 rounded-t-[22px] bg-blanco p-6 text-noche md:p-10">
+          <div className="relative min-w-0 rounded-[22px] bg-blanco p-6 shadow-elevada md:p-10">
             <div className="mb-6 flex items-center justify-between gap-4">
               <h2 className="font-display text-2xl font-bold tracking-[-0.045em]">Tu proyecto</h2>
-              <span className="font-mono text-[11px] tracking-[0.12em] text-niebla uppercase">Formulario</span>
+              <span className="font-mono text-[11px] tracking-[0.12em] text-pizarra uppercase">Formulario</span>
             </div>
             <Suspense fallback={<ContactForm />}>
               <ContactFormWithParams />

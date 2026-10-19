@@ -114,7 +114,20 @@ export function Asistente() {
             <div ref={finRef} />
           </div>
 
-          <form onSubmit={onSubmit} className="flex gap-2 border-t border-borde bg-blanco p-3">
+          <div className="border-t border-borde bg-blanco px-3 pt-3">
+            <a
+              href={whatsappHref()}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-track-whatsapp="asistente-boton"
+              aria-label="Escribir a DevMart Solutions por WhatsApp"
+              className="flex h-12 items-center justify-center gap-2.5 rounded-xl bg-[#25D366] text-[15px] font-semibold text-noche transition-colors hover:bg-[#1FB955]"
+            >
+              <SocialIcon red="whatsapp" size={20} />
+              Hablar por WhatsApp
+            </a>
+          </div>
+          <form onSubmit={onSubmit} className="flex gap-2 bg-blanco p-3">
             <input
               ref={inputRef}
               value={texto}
@@ -137,19 +150,7 @@ export function Asistente() {
       )}
 
       {/* Respeta el área segura del móvil (barra de inicio, bordes redondeados). */}
-      <div className="fixed right-[calc(1.25rem+env(safe-area-inset-right))] bottom-[calc(1.25rem+env(safe-area-inset-bottom))] z-40 flex flex-col items-end gap-3 md:right-8 md:bottom-8">
-        {!abierto && (
-          <a
-            href={whatsappHref()}
-            target="_blank"
-            rel="noopener noreferrer"
-            data-track-whatsapp="flotante"
-            aria-label="Escribir a DevMart Solutions por WhatsApp"
-            className="flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-noche shadow-[0_12px_32px_rgba(11,13,18,0.2)] transition-transform duration-150 hover:scale-105 motion-reduce:transition-none"
-          >
-            <SocialIcon red="whatsapp" size={26} />
-          </a>
-        )}
+      <div className="fixed right-[calc(1.25rem+env(safe-area-inset-right))] bottom-[calc(1.25rem+env(safe-area-inset-bottom))] z-40 md:right-8 md:bottom-8">
         <div className="flex items-center gap-3">
           {!visto && !abierto && (
             <button

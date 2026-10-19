@@ -143,7 +143,7 @@ export function Footer() {
       </div>
 
       <div className="relative border-t border-white/15 bg-noche">
-        <div className="container-dm flex flex-col gap-3 pt-6 pb-44 font-mono text-xs text-niebla md:flex-row md:items-center md:justify-between md:pr-28 md:pb-6">
+        <div className="container-dm flex flex-col gap-3 pt-6 pb-28 font-mono text-xs text-niebla md:flex-row md:items-center md:justify-between md:pr-24 md:pb-6">
           <span>© 2026 {site.name} · {site.city}</span>
           <Link href="/privacidad" className="transition-colors hover:text-cielo">
             Privacidad y cookies · Ley 1581 de 2012
