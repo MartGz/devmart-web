@@ -64,7 +64,21 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       { source: "/(.*)", headers: securityHeaders },
-      // El panel no debe aparecer en buscadores ni guardarse en cachés compartidas.
+      // El panel y el portal de clientes no deben aparecer en buscadores ni guardarse en cachés compartidas.
+      {
+        source: "/portal/:path*",
+        headers: [
+          { key: "X-Robots-Tag", value: "noindex, nofollow" },
+          { key: "Cache-Control", value: "private, no-store" },
+        ],
+      },
+      {
+        source: "/portal",
+        headers: [
+          { key: "X-Robots-Tag", value: "noindex, nofollow" },
+          { key: "Cache-Control", value: "private, no-store" },
+        ],
+      },
       {
         source: "/admin/:path*",
         headers: [

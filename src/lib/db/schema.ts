@@ -1,4 +1,4 @@
-import { boolean, index, integer, jsonb, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
+import { boolean, date, index, integer, jsonb, pgTable, serial, text, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
 
 export const estadosMensaje = ["nuevo", "en_conversacion", "cerrado", "descartado"] as const;
 export type EstadoMensaje = (typeof estadosMensaje)[number];
@@ -98,3 +98,133 @@ export const ajustes = pgTable("ajustes", {
   clave: text("clave").primaryKey(),
   valor: text("valor").notNull(),
 });
+
+/* ───────────── Portal de clientes ─────────────
+   Datos privados de cada cliente. Nada de esto es público: el portafolio sigue en `proyectos`. */
+
+export const estadosEtapa = ["pendiente", "en_curso", "completada"] as const;
+export type EstadoEtapa = (typeof estadosEtapa)[number];
+
+export const estadosEntregable = ["por_aprobar", "aprobado", "cambios_pedidos"] as const;
+export type EstadoEntregable = (typeof estadosEntregable)[number];
+
+export const estadosPago = ["pendiente", "pagado"] as const;
+export type EstadoPago = (typeof estadosPago)[number];
+
+export const estadosSolicitud = ["abierta", "en_revision", "resuelta"] as const;
+export type EstadoSolicitud = (typeof estadosSolicitud)[number];
+
+/** Clientes con acceso al portal (entran con un enlace mágico a su email). */
+export const clientes = pgTable("clientes", {
+  id: serial("id").primaryKey(),
+  nombre: text("nombre").notNull(),
+  email: text("email").notNull().unique(),
+  empresa: text("empresa").notNull().default(""),
+  activo: boolean("activo").notNull().default(true),
+  creado: timestamp("creado", { withTimezone: true }).notNull().defaultNow(),
+});
+
+/** Enlaces de acceso de un solo uso. Solo se guarda la huella (sha256) del token. */
+export const accesosCliente = pgTable(
+  "accesos_cliente",
+  {
+    id: serial("id").primaryKey(),
+    clienteId: integer("cliente_id")
+      .notNull()
+      .references(() => clientes.id, { onDelete: "cascade" }),
+    hash: text("hash").notNull().unique(),
+    expira: timestamp("expira", { withTimezone: true }).notNull(),
+    usado: timestamp("usado", { withTimezone: true }),
+    creado: timestamp("creado", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("accesos_cliente_cliente_idx").on(t.clienteId)],
+);
+
+/** Proyecto privado de un cliente (lo que se construye para él). */
+export const obras = pgTable(
+  "obras",
+  {
+    id: serial("id").primaryKey(),
+    clienteId: integer("cliente_id")
+      .notNull()
+      .references(() => clientes.id, { onDelete: "cascade" }),
+    nombre: text("nombre").notNull(),
+    tipo: text("tipo").notNull(),
+    /** Texto libre corto: «En diseño», «En desarrollo», «Entregado»… */
+    estado: text("estado").notNull().default("En curso"),
+    /** AAAA-MM-DD */
+    fechaEntregaEstimada: date("fecha_entrega_estimada"),
+    creado: timestamp("creado", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("obras_cliente_idx").on(t.clienteId)],
+);
+
+export const etapas = pgTable(
+  "etapas",
+  {
+    id: serial("id").primaryKey(),
+    obraId: integer("obra_id")
+      .notNull()
+      .references(() => obras.id, { onDelete: "cascade" }),
+    orden: integer("orden").notNull().default(0),
+    nombre: text("nombre").notNull(),
+    estado: text("estado").$type<EstadoEtapa>().notNull().default("pendiente"),
+    porcentaje: integer("porcentaje").notNull().default(0),
+    fecha: date("fecha"),
+  },
+  (t) => [index("etapas_obra_idx").on(t.obraId)],
+);
+
+export const entregables = pgTable(
+  "entregables",
+  {
+    id: serial("id").primaryKey(),
+    obraId: integer("obra_id")
+      .notNull()
+      .references(() => obras.id, { onDelete: "cascade" }),
+    titulo: text("titulo").notNull(),
+    version: text("version").notNull().default("v1"),
+    /** Enlace para revisar (prototipo, sitio de prueba, documento). */
+    url: text("url"),
+    /** Captura en Vercel Blob. */
+    imagen: text("imagen"),
+    estado: text("estado").$type<EstadoEntregable>().notNull().default("por_aprobar"),
+    comentarioCliente: text("comentario_cliente").notNull().default(""),
+    creado: timestamp("creado", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("entregables_obra_idx").on(t.obraId)],
+);
+
+export const pagos = pgTable(
+  "pagos",
+  {
+    id: serial("id").primaryKey(),
+    obraId: integer("obra_id")
+      .notNull()
+      .references(() => obras.id, { onDelete: "cascade" }),
+    concepto: text("concepto").notNull(),
+    /** Pesos colombianos, sin decimales. */
+    monto: integer("monto").notNull(),
+    estado: text("estado").$type<EstadoPago>().notNull().default("pendiente"),
+    /** AAAA-MM-DD; fecha en que se pagó (o se espera pagar). */
+    fechaPago: date("fecha_pago"),
+  },
+  (t) => [index("pagos_obra_idx").on(t.obraId)],
+);
+
+export const solicitudes = pgTable(
+  "solicitudes",
+  {
+    id: serial("id").primaryKey(),
+    obraId: integer("obra_id")
+      .notNull()
+      .references(() => obras.id, { onDelete: "cascade" }),
+    /** Consecutivo dentro de la obra (#1, #2…). */
+    numero: integer("numero").notNull(),
+    titulo: text("titulo").notNull(),
+    detalle: text("detalle").notNull(),
+    estado: text("estado").$type<EstadoSolicitud>().notNull().default("abierta"),
+    creado: timestamp("creado", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("solicitudes_obra_idx").on(t.obraId), uniqueIndex("solicitudes_obra_numero_idx").on(t.obraId, t.numero)],
+);

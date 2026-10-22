@@ -66,7 +66,25 @@ Se entra en **devmart.co/admin** con email, contraseña y el código de la app d
 | Actividad | `(panel)/actividad/page.tsx` | Registro de inicios de sesión y cambios |
 | Cuenta | `(panel)/cuenta/page.tsx` | Cambiar contraseña y volver a vincular la app |
 
-Las acciones del panel (guardar, eliminar, subir imágenes) están en `src/lib/admin/actions.ts`; las lecturas en `src/lib/admin/queries.ts`.
+| Clientes | `(panel)/clientes/`, `(panel)/obras/[id]` | Clientes del portal, sus obras, etapas, entregables, pagos y solicitudes |
+
+Las acciones del panel (guardar, eliminar, subir imágenes) están en `src/lib/admin/actions.ts` (y las del portal en `src/lib/admin/portal-actions.ts`); las lecturas en `src/lib/admin/queries.ts` y `src/lib/admin/portal-queries.ts`.
+
+## Portal de clientes · `src/app/portal`
+
+Cada cliente entra en **devmart.co/portal** con un enlace de un solo uso que le llega al correo (15 minutos, sin contraseña). Solo ve sus propias obras.
+
+| Pantalla | Archivo | Para qué |
+|---|---|---|
+| Ingreso | `ingreso/page.tsx` | Pide el enlace con su email |
+| Acceso | `acceso/page.tsx` | Abre el enlace y entra con un clic |
+| Inicio | `(app)/page.tsx` | Avance general, días a la entrega, próximo paso |
+| Avance | `(app)/avance/page.tsx` | Línea de tiempo de etapas |
+| Entregables | `(app)/entregables/page.tsx` | Aprobar o pedir cambios |
+| Pagos | `(app)/pagos/page.tsx` | Solo lectura; «Pagar» llega con Wompi |
+| Soporte | `(app)/soporte/page.tsx` | Abrir y seguir solicitudes |
+
+Acceso y sesión del cliente: `src/lib/auth/cliente.ts` (`requireCliente()`); lecturas: `src/lib/portal/datos.ts`; avisos por correo: `src/lib/portal/avisos.ts`; acciones: `src/app/portal/actions.ts`.
 
 ## Componentes · `src/components`
 

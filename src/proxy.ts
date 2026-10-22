@@ -1,10 +1,19 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { SESSION_COOKIE } from "@/lib/auth/constants";
+import { CLIENTE_COOKIE, SESSION_COOKIE } from "@/lib/auth/constants";
 
-// Comprobación optimista: sin cookie de sesión, /admin redirige al login. La verificación real
-// (sello, caducidad, huella de la contraseña) la hace requireAdmin() en cada página y acción.
+// Comprobación optimista: sin la cookie de sesión correspondiente, /admin y /portal llevan a su
+// pantalla de entrada. La verificación real la hacen requireAdmin() y requireCliente() en cada
+// página y acción.
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  if (pathname === "/portal" || pathname.startsWith("/portal/")) {
+    // Pedir el enlace y abrirlo no requieren sesión.
+    if (pathname.startsWith("/portal/ingreso") || pathname.startsWith("/portal/acceso")) return NextResponse.next();
+    if (!request.cookies.has(CLIENTE_COOKIE)) return NextResponse.redirect(new URL("/portal/ingreso", request.url));
+    return NextResponse.next();
+  }
+
   // Entrar, recuperar la contraseña y crear una nueva no requieren sesión.
   if (pathname === "/admin/login" || pathname.startsWith("/admin/login/")) return NextResponse.next();
   if (!request.cookies.has(SESSION_COOKIE)) {
@@ -14,5 +23,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/admin/:path*", "/portal", "/portal/:path*"],
 };

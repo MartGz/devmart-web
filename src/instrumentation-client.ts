@@ -7,5 +7,6 @@ initBotId({
     { path: "/admin/login", method: "POST" },
     { path: "/admin/login/recuperar", method: "POST" },
     { path: "/admin/login/nueva", method: "POST" },
+    { path: "/portal/ingreso", method: "POST" },
   ],
 });

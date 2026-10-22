@@ -20,8 +20,9 @@ export function ImagenField({
   aspect = "aspect-[4/3]",
 }: {
   name: string;
-  altName: string;
-  quitarName: string;
+  /** Sin altName no se muestra el campo de texto alternativo. */
+  altName?: string;
+  quitarName?: string;
   actual?: string | null;
   alt?: string;
   label: string;
@@ -76,10 +77,12 @@ export function ImagenField({
             {aviso}
           </p>
         )}
-        <Field label="Texto alternativo" hint="qué se ve en la imagen">
-          <Input name={altName} defaultValue={alt ?? ""} maxLength={200} placeholder="p. ej. Página de inicio de la tienda en un portátil" />
-        </Field>
-        {actual && <Checkbox key={actual} name={quitarName} label="Quitar la imagen actual" />}
+        {altName && (
+          <Field label="Texto alternativo" hint="qué se ve en la imagen">
+            <Input name={altName} defaultValue={alt ?? ""} maxLength={200} placeholder="p. ej. Página de inicio de la tienda en un portátil" />
+          </Field>
+        )}
+        {actual && quitarName && <Checkbox key={actual} name={quitarName} label="Quitar la imagen actual" />}
       </div>
     </div>
   );
