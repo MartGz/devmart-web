@@ -48,7 +48,6 @@ src/
     site.ts              Nombre, ciudad, URL, email y WhatsApp
     content.ts, blog.ts  Contenido inicial y respaldo si no hay base de datos
 scripts/                 seed.ts y admin-setup.ts
-Identidad visual DevMart Solutions/   Manual de marca y handoff de diseño
 ```
 
 Los colores y estilos de marca (Noche, Cielo, Nube…) están definidos como tokens en `src/app/globals.css`.

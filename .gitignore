@@ -50,3 +50,8 @@ next-env.d.ts
 skills-lock.json
 
 .env*
+
+# Material interno: se queda en el computador, no se sube al repositorio.
+/Identidad visual DevMart Solutions/
+/docs/
+/.claude/

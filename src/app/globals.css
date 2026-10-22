@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* Design tokens — ver «Identidad visual DevMart Solutions/design_handoff_devmart_web/README.md» */
+/* Design tokens de la marca DevMart (el manual de marca se guarda fuera del repositorio). */
 @theme {
   --color-noche: #0b0d12;
   --color-cielo: #3ec1f3;
